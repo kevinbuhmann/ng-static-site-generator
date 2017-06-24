@@ -14,7 +14,6 @@
   },
   "files": [
     "./src/cli.ts",
-    "./src/index.ts",
-    "./src/webpack.ts"
+    "./src/index.ts"
   ]
 }

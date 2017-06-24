@@ -3,10 +3,10 @@ import { readFileSync } from 'fs';
 import { join as joinPaths } from 'path';
 import { Observable } from 'rxjs/Observable';
 
-import { createAppServerModule } from './app-server.module';
-import { BlogService, BLOG_PATH } from './services/blog.service';
-import { safeWriteFileSync } from './utilities/fs.utilities';
-import { renderPage } from './utilities/renderer';
+import { BlogService, BLOG_PATH } from './../services/blog.service';
+import { safeWriteFileSync } from './../utilities/fs.utilities';
+import { appServerModuleFactory } from './app-server-module-factory';
+import { renderPage } from './renderer-page';
 
 export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, pageUrls: string[], blogPath: string, distPath: string) {
   enableProdMode();
@@ -20,7 +20,7 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
   const blog: BlogService = injector.get(BlogService);
 
   const document = readFileSync(joinPaths(distPath, 'index.html')).toString();
-  const appServerModule = createAppServerModule(appModule, appComponent, blogPath);
+  const appServerModule = appServerModuleFactory(appModule, appComponent, blogPath);
 
   const renderPages = Observable.from([...pageUrls, '/404'])
     .mergeMap(url => renderPage(appServerModule, url, document))

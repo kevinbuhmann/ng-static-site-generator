@@ -6,4 +6,4 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 
 export { BlogEntry, BlogEntryMetadata, BlogService } from './services/blog.service';
-export { generateStaticSite } from './generate-static-site';
+export { generateStaticSite } from './lib/generate-static-site';

@@ -5,7 +5,7 @@ import { readFileSync, unlinkSync } from 'fs';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { generateStaticSiteScriptFilename, generateWebpackConfig, Options } from './webpack';
+import { generateStaticSiteScriptFilename, generateWebpackConfig, Options } from './lib/generate-webpack-config';
 
 const options: Options = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
 
