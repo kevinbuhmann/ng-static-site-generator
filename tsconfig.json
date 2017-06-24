@@ -9,7 +9,8 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "newLine": "LF"
   },
   "files": [
     "./src/cli.ts",
