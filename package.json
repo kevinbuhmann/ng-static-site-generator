@@ -1,6 +1,6 @@
 {
   "name": "ng-static-site-generator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Kevin Phelps <KevinPhelps11@gmail.com>",
   "license": "MIT",
   "description": "Static site generator for Angular",
@@ -8,6 +8,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint --project tsconfig.json --type-check",
+    "prepublish": "npm run build",
     "prebuild": "npm run clean && npm run lint",
     "build": "tsc --project tsconfig.json"
   },
