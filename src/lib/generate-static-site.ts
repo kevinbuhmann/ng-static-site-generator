@@ -1,12 +1,13 @@
 import { enableProdMode, Provider, ReflectiveInjector, Type } from '@angular/core';
+import { renderModule } from '@angular/platform-server';
 import { readFileSync } from 'fs';
 import { join as joinPaths } from 'path';
-import { Observable } from 'rxjs/Observable';
 
 import { BlogService, BLOG_PATH } from './../services/blog.service';
 import { safeWriteFileSync } from './../utilities/fs.utilities';
+import { minifyHtml } from './../utilities/html-minify';
 import { appServerModuleFactory } from './app-server-module-factory';
-import { renderPage } from './renderer-page';
+import { templateFilename } from './generate-webpack-config';
 
 export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, pageUrls: string[], blogPath: string, distPath: string) {
   enableProdMode();
@@ -19,26 +20,28 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
   const injector = ReflectiveInjector.resolveAndCreate(providers);
   const blog: BlogService = injector.get(BlogService);
 
-  const document = readFileSync(joinPaths(distPath, 'index.html')).toString();
+  const template = readFileSync(joinPaths(distPath, templateFilename)).toString();
   const appServerModule = appServerModuleFactory(appModule, appComponent, blogPath);
 
-  const renderPages = Observable.from([...pageUrls, '/404'])
-    .mergeMap(url => renderPage(appServerModule, url, document))
-    .do(page => { savePage(distPath, page.url, page.html); });
+  const urls = [
+    '/404',
+    ...pageUrls,
+    ...blog.getBlogList().map(blogEntry => blogEntry.url)
+  ];
 
-  const renderBlog = Observable.from(blog.getBlogList())
-    .mergeMap(blogEntry => renderPage(appServerModule, blogEntry.url, document))
-    .do(page => { savePage(distPath, page.url, page.html); });
-
-  Observable.forkJoin(renderPages, renderBlog)
-    .subscribe(() => { }, error => { exit(error); }, () => { exit(); });
+  Promise.all(urls.map(url => renderPage(appServerModule, url, template, distPath)))
+    .then(() => { exit(); }, error => { exit(error); });
 }
 
-function savePage(distPath: string, url: string, html: string) {
-  const urlWithFilename = url.endsWith('/') ? joinPaths(url, `index.html`) : `${url}.html`;
-  const filePath = joinPaths(distPath, urlWithFilename);
+function renderPage<M>(appServerModule: Type<M>, url: string, document: string, distPath: string) {
+  return renderModule(appServerModule, { url, document })
+    .then(html => minifyHtml(html))
+    .then(html => {
+      const urlWithFilename = url.endsWith('/') ? joinPaths(url, `index.html`) : `${url}.html`;
+      const filePath = joinPaths(distPath, urlWithFilename);
 
-  safeWriteFileSync(filePath, html);
+      safeWriteFileSync(filePath, html);
+    });
 }
 
 function exit(error?: any) {

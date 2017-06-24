@@ -7,20 +7,13 @@ const webpackNodeExternals = require('webpack-node-externals');
 const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
-export interface Options {
-  appModule: string;
-  appComponent: string;
-  pageUrls: string[];
-  distPath: string;
-  blogPath: string;
-  stylesPath: string;
-  templatePath: string;
-}
+import { NgStaticSiteGeneratorOptions } from './options';
 
+export const templateFilename = 'template.html';
 export const generateStaticSiteScriptFilename = 'generate-static-site';
 const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
 
-export function generateWebpackConfig(options: Options): webpack.Configuration {
+export function generateWebpackConfig(options: NgStaticSiteGeneratorOptions): webpack.Configuration {
   return {
     target: 'node',
     externals: [
@@ -78,6 +71,7 @@ export function generateWebpackConfig(options: Options): webpack.Configuration {
       new ExtractTextPlugin('styles.[hash].css'),
       new HtmlWebpackPlugin({
         template: options.templatePath,
+        filename: templateFilename,
         chunks: ['styles'],
         excludeAssets: [/style.*.js/]
       }),
@@ -86,7 +80,7 @@ export function generateWebpackConfig(options: Options): webpack.Configuration {
   };
 }
 
-function generateEntryScript(options: Options) {
+function generateEntryScript(options: NgStaticSiteGeneratorOptions) {
   const appModule = parseModulePath(options.appModule);
   const appComponent = parseModulePath(options.appComponent);
 
@@ -94,7 +88,7 @@ function generateEntryScript(options: Options) {
 import 'reflect-metadata';
 import 'zone.js/dist/zone-node';
 
-import { generateStaticSite } from 'ng-static-site-generator';
+import { generateStaticSite } from 'ng-static-site-generator/dist/lib/generate-static-site';
 
 import { ${appModule.name} } from '${appModule.path}';
 import { ${appComponent.name} } from '${appComponent.path}';

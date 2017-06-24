@@ -1,38 +1,12 @@
 #! /usr/bin/env node
 
-import { fork } from 'child_process';
-import { readFileSync, unlinkSync } from 'fs';
-import { join as joinPaths } from 'path';
-import * as webpack from 'webpack';
+import { readFileSync } from 'fs';
 
-import { generateStaticSiteScriptFilename, generateWebpackConfig, Options } from './lib/generate-webpack-config';
+import { NgStaticSiteGeneratorOptions } from './lib/options';
+import { BuildTask } from './tasks/build.task';
 
-const options: Options = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
+const options: NgStaticSiteGeneratorOptions = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
 
-const webpackConfig = generateWebpackConfig(options);
-const webpackCompiler = webpack(webpackConfig);
-
-webpackCompiler.run(callback);
-
-function callback(error: Error, stats: webpack.compiler.Stats) {
-  if (stats.hasErrors()) {
-    console.log(stats.toString({ colors: true }));
-
-    if (error) {
-      console.log(error.toString());
-    }
-
-    process.exit(1);
-  }
-
-  console.log(stats.toString({ colors: true, children: false, chunks: false }));
-
-  const generateStaticSiteScriptPath = joinPaths(options.distPath, `${generateStaticSiteScriptFilename}.js`);
-
-  const generateStaticSiteProcess = fork(generateStaticSiteScriptPath);
-
-  generateStaticSiteProcess.on('exit', code => {
-    unlinkSync(generateStaticSiteScriptPath);
-    process.exit(code && code > 0 ? 1 : 0);
-  });
-}
+new BuildTask(options).run()
+  .then(() => { process.exit(0); })
+  .catch(() => { process.exit(1); });
