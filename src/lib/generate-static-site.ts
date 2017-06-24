@@ -1,5 +1,6 @@
 import { enableProdMode, Provider, ReflectiveInjector, Type } from '@angular/core';
 import { renderModule } from '@angular/platform-server';
+import * as chalk from 'chalk';
 import { readFileSync } from 'fs';
 import { join as joinPaths } from 'path';
 
@@ -41,6 +42,7 @@ function renderPage<M>(appServerModule: Type<M>, url: string, document: string, 
       const filePath = joinPaths(distPath, urlWithFilename);
 
       safeWriteFileSync(filePath, html);
+      console.log(`${chalk.bold('ng-static-site-generator:')} ${chalk.green(filePath)} written.`);
     });
 }
 

@@ -1,3 +1,4 @@
+import * as chalk from 'chalk';
 import { fork } from 'child_process';
 import { unlinkSync } from 'fs';
 import { join as joinPaths } from 'path';
@@ -27,6 +28,8 @@ export class BuildTask {
     const generateStaticSiteScriptDistPath = joinPaths(this.options.distPath, `${generateStaticSiteScriptFilename}.js`);
 
     return new Promise<void>((resolve, reject) => {
+      console.log(`\n${chalk.gray.bold('ng-static-site-generator results:')}\n`);
+
       const generateStaticSiteProcess = fork(generateStaticSiteScriptDistPath);
 
       generateStaticSiteProcess.on('exit', code => {
@@ -42,6 +45,8 @@ export class BuildTask {
   }
 
   private webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: () => void, reject: () => void) {
+    console.log(`\n${chalk.gray.bold('webpack build results:')}\n`);
+
     if (stats.hasErrors()) {
       console.log(stats.toString({ colors: true }));
 
