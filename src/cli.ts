@@ -9,24 +9,23 @@ import { generateStaticSiteScriptFilename, generateWebpackConfig, Options } from
 
 const options: Options = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
 
-const statsOptions: webpack.compiler.StatsToStringOptions = {
-  colors: true,
-  children: false,
-  chunks: false
-};
-
 const webpackConfig = generateWebpackConfig(options);
 const webpackCompiler = webpack(webpackConfig);
 
 webpackCompiler.run(callback);
 
 function callback(error: Error, stats: webpack.compiler.Stats) {
-  if (stats.hasErrors() || error) {
-    console.log(error.toString());
+  if (stats.hasErrors()) {
+    console.log(stats.toString({ colors: true }));
+
+    if (error) {
+      console.log(error.toString());
+    }
+
     process.exit(1);
   }
 
-  console.log(stats.toString(statsOptions));
+  console.log(stats.toString({ colors: true, children: false, chunks: false }));
 
   const generateStaticSiteScriptPath = joinPaths(options.distPath, `${generateStaticSiteScriptFilename}.js`);
 
