@@ -14,12 +14,6 @@
   dependencies:
     tslib "^1.7.1"
 
-"@angular/compiler@4.2.4":
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-4.2.4.tgz#7936a87b2d483abcef840b868c1fcf67221c4914"
-  dependencies:
-    tslib "^1.7.1"
-
 "@angular/core@4.2.4":
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-4.2.4.tgz#e8df7a8dd5de5a327784dfc35b5da6344281cf1b"
@@ -45,12 +39,6 @@
     parse5 "^3.0.1"
     tslib "^1.7.1"
     xhr2 "^0.1.4"
-
-"@angular/router@4.2.4":
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/@angular/router/-/router-4.2.4.tgz#2f193f3a36da19b11a08c9b40e391bd8fde59c56"
-  dependencies:
-    tslib "^1.7.1"
 
 "@types/clean-css@*":
   version "3.4.30"
