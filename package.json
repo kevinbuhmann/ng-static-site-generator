@@ -1,0 +1,52 @@
+{
+  "name": "ng-static-site-generator",
+  "version": "0.1.0",
+  "author": "Kevin Phelps <KevinPhelps11@gmail.com>",
+  "license": "MIT",
+  "description": "Static site generator for Angular",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "lint": "tslint --project tsconfig.json --type-check",
+    "prebuild": "npm run clean && npm run lint",
+    "build": "tsc --project tsconfig.json"
+  },
+  "dependencies": {
+    "@angular/animations": "4.2.4",
+    "@angular/common": "4.2.4",
+    "@angular/compiler": "4.2.4",
+    "@angular/core": "4.2.4",
+    "@angular/http": "4.2.4",
+    "@angular/platform-browser": "4.2.4",
+    "@angular/platform-server": "4.2.4",
+    "@angular/router": "4.2.4",
+    "html-minifier": "3.5.2",
+    "js-yaml": "3.8.4",
+    "rxjs": "5.4.1",
+    "zone.js": "0.8.12"
+  },
+  "devDependencies": {
+    "@types/html-minifier": "1.1.30",
+    "@types/js-yaml": "3.5.31",
+    "@types/node": "8.0.1",
+    "@types/rimraf": "0.0.28",
+    "reflect-metadata": "0.1.10",
+    "rimraf": "2.6.1",
+    "ts-node": "3.1.0",
+    "tslint": "4.5.1",
+    "typescript": "2.3.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinphelps/ng-static-site-generator.git"
+  },
+  "keywords": [
+    "angular",
+    "static site",
+    "static site generator"
+  ],
+  "bugs": {
+    "url": "https://github.com/kevinphelps/ng-static-site-generator/issues"
+  },
+  "homepage": "https://github.com/kevinphelps/ng-static-site-generator#readme"
+}
