@@ -17,6 +17,9 @@ export interface Options {
   templatePath: string;
 }
 
+export const generateStaticSiteScriptFilename = 'generate-static-site';
+const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
+
 export function generateWebpackConfig(options: Options): webpack.Configuration {
   return {
     target: 'node',
@@ -25,7 +28,7 @@ export function generateWebpackConfig(options: Options): webpack.Configuration {
     ],
     entry: {
       'styles': options.stylesPath,
-      'generate-static-site': './generate-static-site.ts'
+      [generateStaticSiteScriptFilename]: generateStaticSiteScriptPath
     },
     output: {
       path: resolve(options.distPath),
@@ -69,7 +72,7 @@ export function generateWebpackConfig(options: Options): webpack.Configuration {
     },
     plugins: [
       new VirtualModuleWebpackPlugin({
-        moduleName: './generate-static-site.ts',
+        moduleName: generateStaticSiteScriptPath,
         contents: generateEntryScript(options)
       }),
       new ExtractTextPlugin('styles.[hash].css'),
