@@ -11,25 +11,26 @@ import { NgStaticSiteGeneratorOptions } from './../lib/options';
 import { Task } from './task';
 
 export class BuildTask implements Task {
-  constructor(protected options: NgStaticSiteGeneratorOptions, private watch: boolean) { }
+  constructor(private options: NgStaticSiteGeneratorOptions, private watch: boolean) { }
 
   run() {
     return this.runWebpackBuild();
   }
 
-  protected getWebpackCompiler() {
+  private runWebpackBuild() {
     const webpackConfig = generateWebpackConfig(this.options);
-    return webpack(webpackConfig);
-  }
+    const webpackCompiler = webpack(webpackConfig);
 
-  protected generateStaticSite() {
     return new Promise<void>((resolve, reject) => {
-      this.deleteHtmlFilesExceptTemplate();
-      this.executeGenerateStaticSiteScript(resolve, reject);
+      if (this.watch) {
+        webpackCompiler.watch({ poll: false }, (error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
+      } else {
+        webpackCompiler.run((error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
+      }
     });
   }
 
-  protected webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
+  private webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
     console.log(`\n${chalk.gray.bold('webpack build results:')}\n`);
 
     if (stats.hasErrors()) {
@@ -46,15 +47,10 @@ export class BuildTask implements Task {
     }
   }
 
-  private runWebpackBuild() {
-    const webpackCompiler = this.getWebpackCompiler();
-
+  private generateStaticSite() {
     return new Promise<void>((resolve, reject) => {
-      if (this.watch) {
-        webpackCompiler.watch({ poll: false }, (error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
-      } else {
-        webpackCompiler.run((error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
-      }
+      this.deleteHtmlFilesExceptTemplate();
+      this.executeGenerateStaticSiteScript(resolve, reject);
     });
   }
 
