@@ -5,20 +5,9 @@ import { join as joinPaths } from 'path';
 import { Observable } from 'rxjs/Observable';
 import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
-import { BlogService } from './blog.service';
+import { BlogEntry, BlogEntryMetadata, BlogService } from './blog.service';
 
 export const BLOG_PATH = new InjectionToken<string>('BLOG_PATH');
-
-export interface BlogEntryMetadata {
-  title: string;
-  description: string;
-}
-
-export interface BlogEntry extends BlogEntryMetadata {
-  date: string;
-  url: string;
-  body: string;
-}
 
 @Injectable()
 export class RendererBlogService extends BlogService {
