@@ -3,7 +3,7 @@ import { ServerModule } from '@angular/platform-server';
 
 import { BlogService, BLOG_PATH } from './../services/blog.service';
 
-export function appServerModuleFactory<M, C>(appModule: Type<M>, appComponent: Type<C>, blogPath: string): Type<any> {
+export function appRenderModuleFactory<M, C>(appModule: Type<M>, appComponent: Type<C>, blogPath: string): Type<any> {
   @NgModule({
     imports: [
       appModule,
@@ -17,7 +17,7 @@ export function appServerModuleFactory<M, C>(appModule: Type<M>, appComponent: T
       appComponent
     ]
   })
-  class AppServerModule { }
+  class AppRendererModule { }
 
-  return AppServerModule;
+  return AppRendererModule;
 }

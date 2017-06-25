@@ -8,7 +8,7 @@ import { join as joinPaths } from 'path';
 import { BlogService, BLOG_PATH } from './../services/blog.service';
 import { safeWriteFileSync } from './../utilities/fs.utilities';
 import { minifyHtml } from './../utilities/html-minify';
-import { appServerModuleFactory } from './app-server-module-factory';
+import { appRenderModuleFactory } from './app-renderer-module-factory';
 import { templateFilename } from './generate-webpack-config';
 import { getRouteUrls } from './get-route-urls';
 
@@ -24,7 +24,7 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
   const blog: BlogService = injector.get(BlogService);
 
   const template = readFileSync(joinPaths(distPath, templateFilename)).toString();
-  const appServerModule = appServerModuleFactory(appModule, appComponent, blogPath);
+  const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath);
 
   const urls = [
     '/404',
@@ -38,7 +38,7 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
     .then(() => { exit(); }, error => { exit(error); });
 
   function renderPage<M>(url: string, document: string) {
-    return renderModule(appServerModule, { url, document })
+    return renderModule(appRendererModule, { url, document })
       .then(html => minifyHtml(html))
       .then(html => {
         const urlWithFilename = url.endsWith('/') ? `${url}index.html` : `${url}.html`;
