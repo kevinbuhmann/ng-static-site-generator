@@ -95,6 +95,7 @@ export function generateWebpackConfig(options: NgStaticSiteGeneratorOptions): we
 function generateEntryScript(options: NgStaticSiteGeneratorOptions) {
   const appModule = parseModulePath(options.appModule);
   const appComponent = parseModulePath(options.appComponent);
+  const appRoutes = parseModulePath(options.appRoutes);
 
   return `import 'reflect-metadata';
 import 'zone.js/dist/zone-node';
@@ -103,15 +104,12 @@ import { generateStaticSite } from 'ng-static-site-generator/dist/lib/generate-s
 
 import { ${appModule.name} } from '${appModule.path}';
 import { ${appComponent.name} } from '${appComponent.path}';
+import { ${appRoutes.name} } from '${appRoutes.path}';
 
 // This triggers the blog loader which adds a context dependency on the blog path for the watch build mode.
 const nothing = require('${blogEntryPath}');
 
-const pageUrls = ${JSON.stringify(options.pageUrls)};
-const blogPath = '${options.blogPath}';
-const distPath = '${options.distPath}';
-
-generateStaticSite(${appModule.name}, ${appComponent.name}, pageUrls, blogPath, distPath);`;
+generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}', '${options.distPath}');`;
 }
 
 function parseModulePath(modulePath: string) {

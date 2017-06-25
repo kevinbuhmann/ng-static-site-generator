@@ -1,5 +1,6 @@
 import { enableProdMode, Provider, ReflectiveInjector, Type } from '@angular/core';
 import { renderModule } from '@angular/platform-server';
+import { Routes } from '@angular/router';
 import * as chalk from 'chalk';
 import { readFileSync } from 'fs';
 import { join as joinPaths } from 'path';
@@ -9,8 +10,9 @@ import { safeWriteFileSync } from './../utilities/fs.utilities';
 import { minifyHtml } from './../utilities/html-minify';
 import { appServerModuleFactory } from './app-server-module-factory';
 import { templateFilename } from './generate-webpack-config';
+import { getRouteUrls } from './get-route-urls';
 
-export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, pageUrls: string[], blogPath: string, distPath: string) {
+export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, blogPath: string, distPath: string) {
   enableProdMode();
 
   const providers: Provider[] = [
@@ -26,7 +28,7 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
 
   const urls = [
     '/404',
-    ...pageUrls,
+    ...getRouteUrls(routes),
     ...blog.getBlogList().map(blogEntry => blogEntry.url)
   ];
 
