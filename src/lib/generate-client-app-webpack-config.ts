@@ -14,12 +14,14 @@ const nodeModules = joinPaths(process.cwd(), 'node_modules');
 const realNodeModules = realpathSync(nodeModules);
 
 export function generateClientAppWebpackConfig(options: NgStaticSiteGeneratorOptions): webpack.Configuration {
+  const polyfillsEntry = options.polyfillsPath ? { 'polyfills': options.polyfillsPath } : { };
+
   return {
     target: 'web',
     entry: {
       'main': options.mainPath,
       'styles': options.stylesPath,
-      'polyfills': options.polyfillsPath,
+      ...polyfillsEntry
     },
     output: {
       path: resolve(options.distPath),
@@ -64,19 +66,25 @@ export function generateClientAppWebpackConfig(options: NgStaticSiteGeneratorOpt
     },
     plugins: [
       new webpack.ProgressPlugin(),
-      new ExtractTextPlugin('styles.[hash].css'),
-      new HtmlWebpackPlugin({
-        template: options.templatePath,
-        filename: templateFilename,
-        chunks: ['styles', 'main', 'vendor', 'polyfills'],
-        excludeAssets: [/style.*.js/]
-      }),
-      new HtmlWebpackExcludeAssetsPlugin(),
       new webpack.optimize.CommonsChunkPlugin({
         name: 'vendor',
         chunks: ['main'],
         minChunks: (module) => module.resource && (module.resource.startsWith(nodeModules) || module.resource.startsWith(realNodeModules))
       }),
+      ...getTemplatePlugins(options, ['styles', 'main', 'vendor', 'polyfills'])
     ]
   };
+}
+
+export function getTemplatePlugins(options: NgStaticSiteGeneratorOptions, chunks: string[]) {
+  return [
+    new ExtractTextPlugin('styles.[hash].css'),
+    new HtmlWebpackPlugin({
+      chunks,
+      template: options.templatePath,
+      filename: templateFilename,
+      excludeAssets: [/style.*.js/]
+    }),
+    new HtmlWebpackExcludeAssetsPlugin()
+  ];
 }

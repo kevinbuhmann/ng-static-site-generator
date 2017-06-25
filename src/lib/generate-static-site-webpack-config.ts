@@ -1,9 +1,11 @@
+import * as ExtractTextPlugin from 'extract-text-webpack-plugin';
 import { resolve } from 'path';
 import * as webpack from 'webpack';
 
 const webpackNodeExternals = require('webpack-node-externals');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
+import { getTemplatePlugins } from './generate-client-app-webpack-config';
 import { NgStaticSiteGeneratorOptions } from './options';
 
 export const generateStaticSiteScriptFilename = 'generate-static-site';
@@ -12,14 +14,18 @@ const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
 const blogEntry = 'blog';
 const blogEntryPath = `./${blogEntry}.blog`;
 
-export function generateStaticSiteWebpackConfig(options: NgStaticSiteGeneratorOptions): webpack.Configuration {
+export function generateStaticSiteWebpackConfig(options: NgStaticSiteGeneratorOptions, buildTemplate: boolean): webpack.Configuration {
+  const emitFiles = buildTemplate;
+  const stylesEntry = buildTemplate ? { 'styles': options.stylesPath } : { };
+
   return {
     target: 'node',
     externals: [
       webpackNodeExternals()
     ],
     entry: {
-      [generateStaticSiteScriptFilename]: generateStaticSiteScriptPath
+      [generateStaticSiteScriptFilename]: generateStaticSiteScriptPath,
+      ...stylesEntry
     },
     output: {
       path: resolve(options.distPath),
@@ -48,12 +54,16 @@ export function generateStaticSiteWebpackConfig(options: NgStaticSiteGeneratorOp
           exclude: [/styles/]
         },
         {
+          test: /styles\.scss$/,
+          use: ExtractTextPlugin.extract({ fallback: 'style-loader',  use: ['css-loader', 'sass-loader'] })
+        },
+        {
           test: /\.(eot|svg)$/,
-          loader: 'file-loader?emitFile=false&name=[name].[hash:20].[ext]'
+          loader: `file-loader?emitFile=${emitFiles}&name=[name].[hash:20].[ext]`
         },
         {
           test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
-          loader: 'url-loader?emitFile=false&name=[name].[hash:20].[ext]&limit=10000'
+          loader: `url-loader?emitFile=${emitFiles}&name=[name].[hash:20].[ext]&limit=10000`
         },
         {
           test: /\.blog$/,
@@ -70,7 +80,8 @@ export function generateStaticSiteWebpackConfig(options: NgStaticSiteGeneratorOp
       new VirtualModuleWebpackPlugin({
         moduleName: generateStaticSiteScriptPath,
         contents: generateEntryScript(options)
-      })
+      }),
+      ...(buildTemplate ? getTemplatePlugins(options, ['styles']) : [])
     ]
   };
 }
