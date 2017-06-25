@@ -1,7 +1,8 @@
 import { NgModule, Type } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 
-import { BlogService, BLOG_PATH } from './../services/blog.service';
+import { BlogService } from './../services/blog.service';
+import { BLOG_PATH, RendererBlogService } from './../services/renderer-blog.service';
 
 export function appRenderModuleFactory<M, C>(appModule: Type<M>, appComponent: Type<C>, blogPath: string): Type<any> {
   @NgModule({
@@ -10,8 +11,8 @@ export function appRenderModuleFactory<M, C>(appModule: Type<M>, appComponent: T
       ServerModule
     ],
     providers: [
-      BlogService,
-      { provide: BLOG_PATH, useValue: blogPath }
+      { provide: BLOG_PATH, useValue: blogPath },
+      { provide: BlogService, useClass: RendererBlogService }
     ],
     bootstrap: [
       appComponent

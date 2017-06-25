@@ -1,4 +1,3 @@
-
 import * as chalk from 'chalk';
 import { fork } from 'child_process';
 import { existsSync, unlinkSync } from 'fs';
@@ -6,9 +5,13 @@ import { sync as globSync } from 'glob';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { generateStaticSiteScriptFilename, generateWebpackConfig, templateFilename } from './../lib/generate-webpack-config';
+import { generateWebpackConfig } from './../lib/generate-webpack-config';
 import { NgStaticSiteGeneratorOptions } from './../lib/options';
 import { Task } from './task';
+
+import { templateFilename } from './../lib/generate-client-app-webpack-config';
+import { generateStaticSiteScriptFilename } from './../lib/generate-static-site-webpack-config';
+import { MultiCompiler, MultiStats } from './../types/multi-webpack';
 
 export class BuildTask implements Task {
   constructor(private options: NgStaticSiteGeneratorOptions, private watch: boolean) { }
@@ -19,7 +22,7 @@ export class BuildTask implements Task {
 
   private runWebpackBuild() {
     const webpackConfig = generateWebpackConfig(this.options);
-    const webpackCompiler = webpack(webpackConfig);
+    const webpackCompiler: MultiCompiler = webpack(webpackConfig);
 
     return new Promise<void>((resolve, reject) => {
       if (this.watch) {
@@ -30,11 +33,11 @@ export class BuildTask implements Task {
     });
   }
 
-  private webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
+  private webpackCompilerCallback(error: Error, multiStats: MultiStats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
     console.log(`\n${chalk.gray.bold('webpack build results:')}\n`);
 
-    if (stats.hasErrors()) {
-      console.log(stats.toString({ colors: true }));
+    if (multiStats.hasErrors()) {
+      console.log(multiStats.stats.map(stats => stats.toString({ colors: true })).join('\n\n'));
 
       if (error) {
         console.log(error.toString());
@@ -42,7 +45,7 @@ export class BuildTask implements Task {
 
       reject();
     } else {
-      console.log(stats.toString({ colors: true, children: false, chunks: false }));
+      console.log(multiStats.stats.map(stats => stats.toString({ colors: true, children: false, chunks: false, cached: false })).join('\n\n'));
       resolve(this.generateStaticSite());
     }
   }

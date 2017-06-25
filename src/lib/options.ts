@@ -4,6 +4,8 @@ export interface NgStaticSiteGeneratorOptions {
   appRoutes: string;
   distPath: string;
   blogPath: string;
+  mainPath: string;
+  polyfillsPath: string;
   stylesPath: string;
   templatePath: string;
 }
