@@ -5,6 +5,7 @@ import { join as joinPaths } from 'path';
 import { Observable } from 'rxjs/Observable';
 import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
+import { minifyHtml } from '../utilities/html-minify';
 import { BlogEntry, BlogEntryMetadata, BlogService } from './blog.service';
 
 export const BLOG_PATH = new InjectionToken<string>('BLOG_PATH');
@@ -51,7 +52,7 @@ export class RendererBlogService extends BlogService {
     const date = parsedFilename.date;
     const url = `/blog/${date}/${parsedFilename.urlSlug}`;
     const metadata: BlogEntryMetadata = parseYaml(fileContentsMatch[1].trim());
-    const body = fileContentsMatch[2].trim();
+    const body = minifyHtml(fileContentsMatch[2].trim());
 
     return { date, url, body, ...metadata } as BlogEntry;
   }
