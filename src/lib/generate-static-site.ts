@@ -30,26 +30,30 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
     ...blog.getBlogList().map(blogEntry => blogEntry.url)
   ];
 
-  Promise.all(urls.map(url => renderPage(appServerModule, url, template, distPath)))
+  const output: string[] = [];
+
+  Promise.all(urls.map(url => renderPage(url, template)))
     .then(() => { exit(); }, error => { exit(error); });
-}
 
-function renderPage<M>(appServerModule: Type<M>, url: string, document: string, distPath: string) {
-  return renderModule(appServerModule, { url, document })
-    .then(html => minifyHtml(html))
-    .then(html => {
-      const urlWithFilename = url.endsWith('/') ? joinPaths(url, `index.html`) : `${url}.html`;
-      const filePath = joinPaths(distPath, urlWithFilename);
+  function renderPage<M>(url: string, document: string) {
+    return renderModule(appServerModule, { url, document })
+      .then(html => minifyHtml(html))
+      .then(html => {
+        const urlWithFilename = url.endsWith('/') ? `${url}index.html` : `${url}.html`;
+        const filePath = joinPaths(distPath, urlWithFilename);
 
-      safeWriteFileSync(filePath, html);
-      console.log(`${chalk.bold('ng-static-site-generator:')} ${chalk.green(filePath)} written.`);
-    });
-}
-
-function exit(error?: any) {
-  if (error) {
-    console.log(error.toString());
+        safeWriteFileSync(filePath, html);
+        output.push(`rendered ${chalk.green(urlWithFilename.substr(1))}`);
+      });
   }
 
-  process.exit(error ? 1 : 0);
+  function exit(error?: any) {
+    if (error) {
+      console.log(error.toString());
+    } else {
+      console.log(`\n${chalk.gray.bold('ng-static-site-generator results:')}\n\n${output.join('\n')}`);
+    }
+
+    process.exit(error ? 1 : 0);
+  }
 }

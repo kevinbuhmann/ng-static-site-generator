@@ -7,10 +7,12 @@ import { readFileSync } from 'fs';
 import { NgStaticSiteGeneratorOptions } from './lib/options';
 import { BuildTask } from './tasks/build.task';
 import { Task } from './tasks/task';
+import { WatchTask } from './tasks/watch.task';
 
 const options: NgStaticSiteGeneratorOptions = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
 
 registerCommand('build', 'Builds the static site.', () => new BuildTask(options));
+registerCommand('watch', 'Builds the static site and rebuilds after changes.', () => new WatchTask(options));
 
 program.parse(process.argv);
 

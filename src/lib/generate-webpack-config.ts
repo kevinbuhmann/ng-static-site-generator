@@ -64,6 +64,7 @@ export function generateWebpackConfig(options: NgStaticSiteGeneratorOptions): we
       ]
     },
     plugins: [
+      new webpack.ProgressPlugin(),
       new VirtualModuleWebpackPlugin({
         moduleName: generateStaticSiteScriptPath,
         contents: generateEntryScript(options)
@@ -84,8 +85,7 @@ function generateEntryScript(options: NgStaticSiteGeneratorOptions) {
   const appModule = parseModulePath(options.appModule);
   const appComponent = parseModulePath(options.appComponent);
 
-  return `
-import 'reflect-metadata';
+  return `import 'reflect-metadata';
 import 'zone.js/dist/zone-node';
 
 import { generateStaticSite } from 'ng-static-site-generator/dist/lib/generate-static-site';

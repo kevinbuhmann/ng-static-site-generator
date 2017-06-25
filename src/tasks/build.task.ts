@@ -1,51 +1,35 @@
+
 import * as chalk from 'chalk';
 import { fork } from 'child_process';
-import { unlinkSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
+import { sync as globSync } from 'glob';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { generateStaticSiteScriptFilename, generateWebpackConfig } from './../lib/generate-webpack-config';
+import { generateStaticSiteScriptFilename, generateWebpackConfig, templateFilename } from './../lib/generate-webpack-config';
 import { NgStaticSiteGeneratorOptions } from './../lib/options';
 import { Task } from './task';
 
 export class BuildTask implements Task {
-  constructor(private options: NgStaticSiteGeneratorOptions) { }
+  constructor(protected options: NgStaticSiteGeneratorOptions, private isWatchTask = false) { }
 
   run() {
-    return this.runWebpackBuild()
-      .then(() => this.generateStaticSite());
+    return this.runWebpackBuild();
   }
 
-  private runWebpackBuild() {
+  protected getWebpackCompiler() {
     const webpackConfig = generateWebpackConfig(this.options);
-    const webpackCompiler = webpack(webpackConfig);
+    return webpack(webpackConfig);
+  }
 
+  protected generateStaticSite() {
     return new Promise<void>((resolve, reject) => {
-      webpackCompiler.run((error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
+      this.deleteHtmlFilesExceptTemplate();
+      this.executeGenerateStaticSiteScript(resolve, reject);
     });
   }
 
-  private generateStaticSite() {
-    const generateStaticSiteScriptDistPath = joinPaths(this.options.distPath, `${generateStaticSiteScriptFilename}.js`);
-
-    return new Promise<void>((resolve, reject) => {
-      console.log(`\n${chalk.gray.bold('ng-static-site-generator results:')}\n`);
-
-      const generateStaticSiteProcess = fork(generateStaticSiteScriptDistPath);
-
-      generateStaticSiteProcess.on('exit', code => {
-        unlinkSync(generateStaticSiteScriptDistPath);
-
-        if (code && code > 0) {
-          reject();
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  private webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: () => void, reject: () => void) {
+  protected webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
     console.log(`\n${chalk.gray.bold('webpack build results:')}\n`);
 
     if (stats.hasErrors()) {
@@ -58,9 +42,50 @@ export class BuildTask implements Task {
       reject();
     } else {
       console.log(stats.toString({ colors: true, children: false, chunks: false }));
+      resolve(this.generateStaticSite());
+    }
+  }
+
+  private runWebpackBuild() {
+    const webpackCompiler = this.getWebpackCompiler();
+
+    return new Promise<void>((resolve, reject) => {
+      webpackCompiler.run((error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
+    });
+  }
+
+  private deleteHtmlFilesExceptTemplate() {
+    const htmlFilePaths = globSync('**/*.html', { cwd: this.options.distPath })
+      .filter(htmlFilePath => htmlFilePath.includes(templateFilename) === false);
+
+    for (const htmlFilePath of htmlFilePaths) {
+      unlinkSync(joinPaths(this.options.distPath, htmlFilePath));
+    }
+  }
+
+  private executeGenerateStaticSiteScript(resolve: () => void, reject: () => void) {
+    const templatePath = joinPaths(this.options.distPath, templateFilename);
+    const scriptPath = joinPaths(this.options.distPath, `${generateStaticSiteScriptFilename}.js`);
+
+    if (existsSync(scriptPath)) {
+      console.log(`\n${chalk.gray.bold('ng-static-site-generator running...')}`);
+
+      const scriptProcess = fork(scriptPath);
+
+      scriptProcess.on('exit', code => {
+        if (this.isWatchTask === false) {
+          unlinkSync(scriptPath);
+          unlinkSync(templatePath);
+        }
+
+        if (code && code > 0) {
+          reject();
+        } else {
+          resolve();
+        }
+      });
+    } else {
       resolve();
     }
   }
 }
-
-
