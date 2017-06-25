@@ -13,8 +13,7 @@ export const templateFilename = 'template.html';
 export const generateStaticSiteScriptFilename = 'generate-static-site';
 const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
 
-// The blog entry point is only added to
-export const blogEntry = 'blog';
+const blogEntry = 'blog';
 const blogEntryPath = `./${blogEntry}.blog`;
 
 export function generateWebpackConfig(options: NgStaticSiteGeneratorOptions): webpack.Configuration {

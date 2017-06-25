@@ -6,12 +6,12 @@ import { sync as globSync } from 'glob';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { blogEntry, generateStaticSiteScriptFilename, generateWebpackConfig, templateFilename } from './../lib/generate-webpack-config';
+import { generateStaticSiteScriptFilename, generateWebpackConfig, templateFilename } from './../lib/generate-webpack-config';
 import { NgStaticSiteGeneratorOptions } from './../lib/options';
 import { Task } from './task';
 
 export class BuildTask implements Task {
-  constructor(protected options: NgStaticSiteGeneratorOptions, private isWatchTask = false) { }
+  constructor(protected options: NgStaticSiteGeneratorOptions, private watch: boolean) { }
 
   run() {
     return this.runWebpackBuild();
@@ -32,8 +32,6 @@ export class BuildTask implements Task {
   protected webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
     console.log(`\n${chalk.gray.bold('webpack build results:')}\n`);
 
-    this.deleteUnneededWebpackBuildArtifacts();
-
     if (stats.hasErrors()) {
       console.log(stats.toString({ colors: true }));
 
@@ -52,7 +50,11 @@ export class BuildTask implements Task {
     const webpackCompiler = this.getWebpackCompiler();
 
     return new Promise<void>((resolve, reject) => {
-      webpackCompiler.run((error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
+      if (this.watch) {
+        webpackCompiler.watch({ poll: false }, (error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
+      } else {
+        webpackCompiler.run((error, stats) => { this.webpackCompilerCallback(error, stats, resolve, reject); });
+      }
     });
   }
 
@@ -62,14 +64,6 @@ export class BuildTask implements Task {
 
     for (const htmlFilePath of htmlFilePaths) {
       unlinkSync(joinPaths(this.options.distPath, htmlFilePath));
-    }
-  }
-
-  private deleteUnneededWebpackBuildArtifacts() {
-    const blogJsPath = joinPaths(this.options.distPath, `${blogEntry}.js`);
-
-    if (existsSync(blogJsPath)) {
-      unlinkSync(blogJsPath);
     }
   }
 
@@ -83,7 +77,7 @@ export class BuildTask implements Task {
       const scriptProcess = fork(scriptPath);
 
       scriptProcess.on('exit', code => {
-        if (this.isWatchTask === false) {
+        if (this.watch === false) {
           unlinkSync(scriptPath);
           unlinkSync(templatePath);
         }
