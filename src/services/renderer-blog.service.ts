@@ -2,7 +2,7 @@ import { Inject, Injectable, InjectionToken } from '@angular/core';
 import { readdirSync, readFileSync } from 'fs';
 import { safeLoad as parseYaml } from 'js-yaml';
 import { join as joinPaths } from 'path';
-import { Observable } from 'rxjs/observable';
+import { Observable } from 'rxjs/Observable';
 import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
 import { BlogService } from './blog.service';
