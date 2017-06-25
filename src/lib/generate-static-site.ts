@@ -8,8 +8,8 @@ import { join as joinPaths } from 'path';
 import { BLOG_PATH, RendererBlogService } from './../services/renderer-blog.service';
 import { safeWriteFileSync } from './../utilities/fs.utilities';
 import { minifyHtml } from './../utilities/html-minify';
+import { templateFilename } from './../webpack/generate-client-app-webpack-config';
 import { appRenderModuleFactory } from './app-renderer-module-factory';
-import { templateFilename } from './generate-client-app-webpack-config';
 import { getRouteUrls } from './get-route-urls';
 
 export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, blogPath: string, distPath: string) {

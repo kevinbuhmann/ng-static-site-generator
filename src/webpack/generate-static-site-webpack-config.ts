@@ -5,8 +5,8 @@ import * as webpack from 'webpack';
 const webpackNodeExternals = require('webpack-node-externals');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
+import { NgStaticSiteGeneratorOptions } from './../lib/options';
 import { getTemplatePlugins } from './generate-client-app-webpack-config';
-import { NgStaticSiteGeneratorOptions } from './options';
 
 export const generateStaticSiteScriptFilename = 'generate-static-site';
 const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
@@ -67,7 +67,7 @@ export function generateStaticSiteWebpackConfig(options: NgStaticSiteGeneratorOp
         },
         {
           test: /\.blog$/,
-          loader: 'ng-static-site-generator/dist/lib/blog-loader'
+          loader: 'ng-static-site-generator/dist/webpack/blog-loader'
         }
       ]
     },

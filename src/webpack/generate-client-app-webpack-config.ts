@@ -6,7 +6,7 @@ import * as webpack from 'webpack';
 
 const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 
-import { NgStaticSiteGeneratorOptions } from './options';
+import { NgStaticSiteGeneratorOptions } from './../lib/options';
 
 export const templateFilename = 'template.html';
 

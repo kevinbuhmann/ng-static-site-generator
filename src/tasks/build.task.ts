@@ -5,13 +5,12 @@ import { sync as globSync } from 'glob';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { generateWebpackConfig } from './../lib/generate-webpack-config';
 import { NgStaticSiteGeneratorOptions } from './../lib/options';
-import { Task } from './task';
-
-import { templateFilename } from './../lib/generate-client-app-webpack-config';
-import { generateStaticSiteScriptFilename } from './../lib/generate-static-site-webpack-config';
 import { MultiCompiler, MultiStats } from './../types/multi-webpack';
+import { templateFilename } from './../webpack/generate-client-app-webpack-config';
+import { generateStaticSiteScriptFilename } from './../webpack/generate-static-site-webpack-config';
+import { generateWebpackConfig } from './../webpack/generate-webpack-config';
+import { Task } from './task';
 
 export class BuildTask implements Task {
   constructor(private options: NgStaticSiteGeneratorOptions, private watch: boolean) { }
