@@ -1,4 +1,3 @@
-import * as ExtractTextPlugin from 'extract-text-webpack-plugin';
 import { resolve } from 'path';
 import * as webpack from 'webpack';
 
@@ -7,6 +6,7 @@ const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
 import { Options } from './../options';
 import { getTemplatePlugins } from './generate-client-app-webpack-config';
+import { getLoaders } from './get-loaders';
 
 export const generateStaticSiteScriptFilename = 'generate-static-site';
 const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
@@ -35,41 +35,7 @@ export function generateStaticSiteWebpackConfig(options: Options, buildTemplate:
       extensions: ['.js', '.ts']
     },
     module: {
-      rules: [
-        {
-          test: /\.ts$/,
-          use: ['awesome-typescript-loader', 'angular2-template-loader']
-        },
-        {
-          test: /\.html$/,
-          use: ['html-loader']
-        },
-        {
-          test: /\.css$/,
-          use: ['to-string-loader', 'css-loader']
-        },
-        {
-          test: /\.scss$/,
-          use: ['to-string-loader', 'css-loader', 'sass-loader'],
-          exclude: [/styles/]
-        },
-        {
-          test: /styles\.scss$/,
-          use: ExtractTextPlugin.extract({ fallback: 'style-loader',  use: ['css-loader', 'sass-loader'] })
-        },
-        {
-          test: /\.(eot|svg)$/,
-          loader: `file-loader?emitFile=${emitFiles}&name=[name].[hash:20].[ext]`
-        },
-        {
-          test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
-          loader: `url-loader?emitFile=${emitFiles}&name=[name].[hash:20].[ext]&limit=10000`
-        },
-        {
-          test: /\.blog$/,
-          loader: 'ng-static-site-generator/dist/webpack/blog-loader'
-        }
-      ]
+      rules: getLoaders({ emitFiles, loadBlog: true })
     },
     plugins: [
       new webpack.ProgressPlugin(),

@@ -7,6 +7,7 @@ import * as webpack from 'webpack';
 const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 
 import { Options } from './../options';
+import { getLoaders } from './get-loaders';
 
 export const templateFilename = 'template.html';
 
@@ -32,37 +33,7 @@ export function generateClientAppWebpackConfig(options: Options): webpack.Config
     },
     module: {
       exprContextCritical: false,
-      rules: [
-        {
-          test: /\.ts$/,
-          use: ['awesome-typescript-loader', 'angular2-template-loader']
-        },
-        {
-          test: /\.html$/,
-          use: ['html-loader']
-        },
-        {
-          test: /\.css$/,
-          use: ['to-string-loader', 'css-loader']
-        },
-        {
-          test: /\.scss$/,
-          use: ['to-string-loader', 'css-loader', 'sass-loader'],
-          exclude: [/styles/]
-        },
-        {
-          test: /styles\.scss$/,
-          use: ExtractTextPlugin.extract({ fallback: 'style-loader',  use: ['css-loader', 'sass-loader'] })
-        },
-        {
-          test: /\.(eot|svg)$/,
-          loader: 'file-loader?name=[name].[hash:20].[ext]'
-        },
-        {
-          test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
-          loader: 'url-loader?name=[name].[hash:20].[ext]&limit=10000'
-        }
-      ]
+      rules: getLoaders({ emitFiles: true, loadBlog: false })
     },
     plugins: [
       new webpack.ProgressPlugin(),
