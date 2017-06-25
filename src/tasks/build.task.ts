@@ -6,8 +6,9 @@ import * as webpack from 'webpack';
 
 import { generateStaticSiteScriptFilename, generateWebpackConfig } from './../lib/generate-webpack-config';
 import { NgStaticSiteGeneratorOptions } from './../lib/options';
+import { Task } from './task';
 
-export class BuildTask {
+export class BuildTask implements Task {
   constructor(private options: NgStaticSiteGeneratorOptions) { }
 
   run() {
