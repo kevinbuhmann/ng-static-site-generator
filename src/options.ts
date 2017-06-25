@@ -1,4 +1,4 @@
-export interface NgStaticSiteGeneratorOptions {
+export interface Options {
   appModule: string;
   appComponent: string;
   appRoutes: string;

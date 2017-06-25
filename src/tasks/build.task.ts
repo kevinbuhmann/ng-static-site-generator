@@ -5,7 +5,7 @@ import { sync as globSync } from 'glob';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { NgStaticSiteGeneratorOptions } from './../lib/options';
+import { Options } from './../options';
 import { MultiCompiler, MultiStats } from './../types/multi-webpack';
 import { templateFilename } from './../webpack/generate-client-app-webpack-config';
 import { generateStaticSiteScriptFilename } from './../webpack/generate-static-site-webpack-config';
@@ -13,7 +13,7 @@ import { generateWebpackConfig } from './../webpack/generate-webpack-config';
 import { Task } from './task';
 
 export class BuildTask implements Task {
-  constructor(private options: NgStaticSiteGeneratorOptions, private watch: boolean) { }
+  constructor(private options: Options, private watch: boolean) { }
 
   run() {
     return this.runWebpackBuild();

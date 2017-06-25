@@ -6,14 +6,14 @@ import * as webpack from 'webpack';
 
 const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 
-import { NgStaticSiteGeneratorOptions } from './../lib/options';
+import { Options } from './../options';
 
 export const templateFilename = 'template.html';
 
 const nodeModules = joinPaths(process.cwd(), 'node_modules');
 const realNodeModules = realpathSync(nodeModules);
 
-export function generateClientAppWebpackConfig(options: NgStaticSiteGeneratorOptions): webpack.Configuration {
+export function generateClientAppWebpackConfig(options: Options): webpack.Configuration {
   const polyfillsEntry = options.polyfillsPath ? { 'polyfills': options.polyfillsPath } : { };
 
   return {
@@ -76,7 +76,7 @@ export function generateClientAppWebpackConfig(options: NgStaticSiteGeneratorOpt
   };
 }
 
-export function getTemplatePlugins(options: NgStaticSiteGeneratorOptions, chunks: string[]) {
+export function getTemplatePlugins(options: Options, chunks: string[]) {
   return [
     new ExtractTextPlugin('styles.[hash].css'),
     new HtmlWebpackPlugin({

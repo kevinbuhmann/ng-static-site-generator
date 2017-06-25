@@ -5,7 +5,7 @@ import * as webpack from 'webpack';
 const webpackNodeExternals = require('webpack-node-externals');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
-import { NgStaticSiteGeneratorOptions } from './../lib/options';
+import { Options } from './../options';
 import { getTemplatePlugins } from './generate-client-app-webpack-config';
 
 export const generateStaticSiteScriptFilename = 'generate-static-site';
@@ -14,7 +14,7 @@ const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
 const blogEntry = 'blog';
 const blogEntryPath = `./${blogEntry}.blog`;
 
-export function generateStaticSiteWebpackConfig(options: NgStaticSiteGeneratorOptions, buildTemplate: boolean): webpack.Configuration {
+export function generateStaticSiteWebpackConfig(options: Options, buildTemplate: boolean): webpack.Configuration {
   const emitFiles = buildTemplate;
   const stylesEntry = buildTemplate ? { 'styles': options.stylesPath } : { };
 
@@ -86,7 +86,7 @@ export function generateStaticSiteWebpackConfig(options: NgStaticSiteGeneratorOp
   };
 }
 
-function generateEntryScript(options: NgStaticSiteGeneratorOptions) {
+function generateEntryScript(options: Options) {
   const appModule = parseModulePath(options.appModule);
   const appComponent = parseModulePath(options.appComponent);
   const appRoutes = parseModulePath(options.appRoutes);
