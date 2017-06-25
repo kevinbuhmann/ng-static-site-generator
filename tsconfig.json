@@ -15,6 +15,7 @@
   "files": [
     "./src/cli.ts",
     "./src/index.ts",
+    "./src/lib/blog-loader.ts",
     "./src/lib/generate-static-site.ts"
   ]
 }

@@ -6,7 +6,7 @@ import { sync as globSync } from 'glob';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { generateStaticSiteScriptFilename, generateWebpackConfig, templateFilename } from './../lib/generate-webpack-config';
+import { blogEntry, generateStaticSiteScriptFilename, generateWebpackConfig, templateFilename } from './../lib/generate-webpack-config';
 import { NgStaticSiteGeneratorOptions } from './../lib/options';
 import { Task } from './task';
 
@@ -31,6 +31,8 @@ export class BuildTask implements Task {
 
   protected webpackCompilerCallback(error: Error, stats: webpack.Stats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
     console.log(`\n${chalk.gray.bold('webpack build results:')}\n`);
+
+    this.deleteUnneededWebpackBuildArtifacts();
 
     if (stats.hasErrors()) {
       console.log(stats.toString({ colors: true }));
@@ -63,6 +65,14 @@ export class BuildTask implements Task {
     }
   }
 
+  private deleteUnneededWebpackBuildArtifacts() {
+    const blogJsPath = joinPaths(this.options.distPath, `${blogEntry}.js`);
+
+    if (existsSync(blogJsPath)) {
+      unlinkSync(blogJsPath);
+    }
+  }
+
   private executeGenerateStaticSiteScript(resolve: () => void, reject: () => void) {
     const templatePath = joinPaths(this.options.distPath, templateFilename);
     const scriptPath = joinPaths(this.options.distPath, `${generateStaticSiteScriptFilename}.js`);
@@ -77,6 +87,7 @@ export class BuildTask implements Task {
           unlinkSync(scriptPath);
           unlinkSync(templatePath);
         }
+
 
         if (code && code > 0) {
           reject();

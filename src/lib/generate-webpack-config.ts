@@ -13,6 +13,10 @@ export const templateFilename = 'template.html';
 export const generateStaticSiteScriptFilename = 'generate-static-site';
 const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
 
+// The blog entry point is only added to
+export const blogEntry = 'blog';
+const blogEntryPath = `./${blogEntry}.blog`;
+
 export function generateWebpackConfig(options: NgStaticSiteGeneratorOptions): webpack.Configuration {
   return {
     target: 'node',
@@ -60,11 +64,19 @@ export function generateWebpackConfig(options: NgStaticSiteGeneratorOptions): we
         {
           test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
           loader: 'url-loader?name=[name].[hash:20].[ext]&limit=10000'
+        },
+        {
+          test: /\.blog$/,
+          loader: 'ng-static-site-generator/dist/lib/blog-loader'
         }
       ]
     },
     plugins: [
       new webpack.ProgressPlugin(),
+      new VirtualModuleWebpackPlugin({
+        moduleName: blogEntryPath,
+        contents: options.blogPath
+      }),
       new VirtualModuleWebpackPlugin({
         moduleName: generateStaticSiteScriptPath,
         contents: generateEntryScript(options)
@@ -92,6 +104,9 @@ import { generateStaticSite } from 'ng-static-site-generator/dist/lib/generate-s
 
 import { ${appModule.name} } from '${appModule.path}';
 import { ${appComponent.name} } from '${appComponent.path}';
+
+// This triggers the blog loader which adds a context dependency on the blog path for the watch build mode.
+const nothing = require('${blogEntryPath}');
 
 const pageUrls = ${JSON.stringify(options.pageUrls)};
 const blogPath = '${options.blogPath}';
