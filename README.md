@@ -16,7 +16,7 @@ There is a [starter project](https://github.com/kevinphelps/ng-static-site-gener
 
 ## Installation
 
-Clone [the starter project](https://github.com/kevinphelps/ng-static-site-generator-starter) tp get started fast!
+Clone [the starter project](https://github.com/kevinphelps/ng-static-site-generator-starter) to get started fast!
 
 `yarn add [--exact] ng-static-site-generator` or `npm install --save-dev [--save-exact] ng-static-site-generator`
 
