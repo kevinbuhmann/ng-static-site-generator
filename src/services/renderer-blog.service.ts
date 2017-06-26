@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken } from '@angular/core';
+import { InjectionToken } from '@angular/core';
 import { readdirSync, readFileSync } from 'fs';
 import { safeLoad as parseYaml } from 'js-yaml';
 import { join as joinPaths } from 'path';
@@ -6,14 +6,12 @@ import { Observable } from 'rxjs/Observable';
 import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
 import { minifyHtml } from '../utilities/html-minify';
-import { BlogEntry, BlogEntryMetadata, BlogService } from './blog.service';
+import { BlogEntry, BlogEntryMetadata, IBlogService } from './blog.service';
 
 export const BLOG_PATH = new InjectionToken<string>('BLOG_PATH');
 
-@Injectable()
-export class RendererBlogService extends BlogService {
-  constructor(@Inject(BLOG_PATH) private blogPath: string) {
-    super();
+export class RendererBlogService implements IBlogService {
+  constructor(private blogPath: string) {
   }
 
   getBlogList(): Observable<BlogEntry[]> {

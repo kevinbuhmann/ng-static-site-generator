@@ -1,15 +1,14 @@
 import * as ExtractTextPlugin from 'extract-text-webpack-plugin';
 
+import { blogHashName } from './asset-names';
+
 export interface LoaderOptions {
   emitFiles: boolean;
-  loadBlog: boolean;
+  includeHash: boolean;
 }
 
 export function getLoaders(options: LoaderOptions): any[] {
-  const blogLoader = {
-    test: /\.blog$/,
-    loader: 'ng-static-site-generator/dist/webpack/blog-loader'
-  };
+  const fileLoaderOptions = `emitFile=${options.emitFiles}&name=${options.includeHash ? '[name].[hash:20].[ext]' : '[name].[ext]'}`;
 
   return [
     {
@@ -35,12 +34,15 @@ export function getLoaders(options: LoaderOptions): any[] {
     },
     {
       test: /\.(eot|svg)$/,
-      loader: `file-loader?emitFile=${options.emitFiles}&name=[name].[hash:20].[ext]`
+      loader: `file-loader?${fileLoaderOptions}`
     },
     {
       test: /\.(jpg|png|gif|otf|ttf|woff|woff2|cur|ani)$/,
-      loader: `url-loader?emitFile=${options.emitFiles}&name=[name].[hash:20].[ext]&limit=10000`
+      loader: `url-loader?${fileLoaderOptions}&limit=10000`
     },
-    ...(options.loadBlog ? [blogLoader] : [])
+    {
+      test: new RegExp(blogHashName),
+      loader: 'ng-static-site-generator/dist/webpack/blog-hash-loader'
+    }
   ];
 }

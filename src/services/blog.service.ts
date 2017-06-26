@@ -14,9 +14,14 @@ export interface BlogEntry extends BlogEntryMetadata {
   body: string;
 }
 
+export interface IBlogService {
+  getBlogList(): Observable<BlogEntry[]>;
+  getBlogEntry(date: string, urlSlug: string): Observable<BlogEntry>;
+}
+
 @Injectable()
-export class BlogService {
-  constructor(private http: Http = null) { }
+export class BlogService implements IBlogService {
+  constructor(private http: Http) { }
 
   getBlogList(): Observable<BlogEntry[]> {
     return map.call(this.http.get('/blog/list.json'), (response: Response) => response.json());

@@ -15,7 +15,7 @@
   "files": [
     "./src/cli.ts",
     "./src/index.ts",
-    "./src/webpack/blog-loader.ts",
+    "./src/webpack/blog-hash-loader.ts",
     "./src/lib/generate-static-site.ts"
   ]
 }

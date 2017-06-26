@@ -1,36 +1,27 @@
-import { enableProdMode, Provider, ReflectiveInjector, Type } from '@angular/core';
+import { enableProdMode, Type } from '@angular/core';
 import { renderModule } from '@angular/platform-server';
 import { Routes } from '@angular/router';
-import * as chalk from 'chalk';
-import { readFileSync } from 'fs';
-import { join as joinPaths } from 'path';
 
-import { BLOG_PATH, RendererBlogService } from './../services/renderer-blog.service';
-import { safeWriteFileSync } from './../utilities/fs.utilities';
+import { BlogEntry } from './../services/blog.service';
+import { RendererBlogService } from './../services/renderer-blog.service';
 import { minifyHtml } from './../utilities/html-minify';
-import { templateAssetName } from './../webpack/asset-names';
 import { appRenderModuleFactory } from './app-renderer-module-factory';
 import { getRouteUrls } from './get-route-urls';
 
-export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, blogPath: string, distPath: string) {
+export interface RenderedFile {
+  path: string;
+  contents: string;
+}
+
+export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, blogPath: string) {
   enableProdMode();
 
-  const providers: Provider[] = [
-    RendererBlogService,
-    { provide: BLOG_PATH, useValue: blogPath }
-  ];
-
-  const injector = ReflectiveInjector.resolveAndCreate(providers);
-  const blog: RendererBlogService = injector.get(RendererBlogService);
-
-  const template = readFileSync(joinPaths(distPath, templateAssetName)).toString();
-  const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath);
-
-  const output: string[] = [];
-
+  const blog = new RendererBlogService(blogPath);
   const blogEntries = blog.getBlogListSync();
 
-  renderBlogJsonData();
+  const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath);
+
+  const files: RenderedFile[] = [];
 
   const urls = [
     '/404',
@@ -38,18 +29,28 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
     ...blogEntries.map(blogEntry => blogEntry.url)
   ];
 
-  Promise.all(urls.map(url => renderPage(url, template)))
+  renderBlogJsonFiles();
+
+  readStandardInput()
+    .then(template => Promise.all(urls.map(url => renderPage(url, template))))
     .then(() => { exit(); }, error => { exit(error); });
 
-  function renderBlogJsonData() {
-    const blogListPath = 'blog/list.json';
-    safeWriteFileSync(joinPaths(distPath, blogListPath), JSON.stringify(blogEntries.map(blogEntry => ({ ...blogEntry, body: undefined }))));
-    output.push(`rendered ${chalk.green(blogListPath)}`);
+  function readStandardInput() {
+    return new Promise<string>(resolve => {
+      process.on('message', message => {
+        if (message.template) {
+          resolve(message.template);
+        }
+      });
+    });
+  }
+
+  function renderBlogJsonFiles() {
+    const blogList: BlogEntry[] = blogEntries.map(blogEntry => ({ ...blogEntry, body: undefined }));
+    files.push({ path: 'blog/list.json', contents: JSON.stringify(blogList) });
 
     for (const blogEntry of blogEntries) {
-      const blogEntryPath = `${blogEntry.url.substr(1)}.json`;
-      safeWriteFileSync(joinPaths(distPath, blogEntryPath), JSON.stringify(blogEntry));
-      output.push(`rendered ${chalk.green(blogEntryPath)}`);
+      files.push({ path: `${blogEntry.url.substr(1)}.json`, contents: JSON.stringify(blogEntry) });
     }
   }
 
@@ -58,18 +59,15 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
       .then(html => minifyHtml(html))
       .then(html => {
         const urlWithFilename = url.endsWith('/') ? `${url}index.html` : `${url}.html`;
-        const filePath = joinPaths(distPath, urlWithFilename);
-
-        safeWriteFileSync(filePath, html);
-        output.push(`rendered ${chalk.green(urlWithFilename.substr(1))}`);
+        files.push({ path: urlWithFilename.substr(1), contents: html });
       });
   }
 
   function exit(error?: any) {
     if (error) {
-      console.log(error.toString());
+      process.send({ source: 'ng-static-site-generator', error: error.toString() });
     } else {
-      console.log(`\n${chalk.gray.bold('ng-static-site-generator results:')}\n\n${output.join('\n')}`);
+      process.send({ source: 'ng-static-site-generator', files });
     }
 
     process.exit(error ? 1 : 0);

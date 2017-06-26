@@ -1,25 +1,23 @@
-import * as chalk from 'chalk';
-import { fork } from 'child_process';
-import { existsSync, unlinkSync } from 'fs';
-import { sync as globSync } from 'glob';
-import { join as joinPaths } from 'path';
+import * as del from 'del';
 import * as webpack from 'webpack';
 
 import { Options } from './../options';
-import { MultiCompiler, MultiStats } from './../types/multi-webpack';
-import { generatorScriptAssetName, templateAssetName } from './../webpack/asset-names';
+import { MultiCompiler, MultiStats, StatsAsset } from './../types/webpack';
 import { generateWebpackConfig } from './../webpack/generate-webpack-config';
 import { Task } from './task';
+
+const WebpackStats = require('webpack/lib/Stats');
 
 export class BuildTask implements Task {
   constructor(private options: Options, private watch: boolean) { }
 
   run() {
-    return this.runWebpackBuild();
+    return this.runWebpackBuild()
+      .then(() => this.deleteUnnecessaryArtifacts());
   }
 
   private runWebpackBuild() {
-    const webpackConfig = generateWebpackConfig(this.options);
+    const webpackConfig = generateWebpackConfig(this.options, this.watch);
     const webpackCompiler: MultiCompiler = webpack(webpackConfig);
 
     return new Promise<void>((resolve, reject) => {
@@ -31,11 +29,9 @@ export class BuildTask implements Task {
     });
   }
 
-  private webpackCompilerCallback(error: Error, multiStats: MultiStats, resolve: (value: void | PromiseLike<void>) => void, reject: () => void) {
-    console.log(`\n${chalk.gray.bold('webpack build results:')}\n`);
-
+  private webpackCompilerCallback(error: Error, multiStats: MultiStats, resolve: () => void, reject: () => void) {
     if (multiStats.hasErrors()) {
-      console.log(multiStats.stats.map(stats => stats.toString({ colors: true })).join('\n\n'));
+      this.printStats(multiStats, true);
 
       if (error) {
         console.log(error.toString());
@@ -43,51 +39,36 @@ export class BuildTask implements Task {
 
       reject();
     } else {
-      console.log(multiStats.stats.map(stats => stats.toString({ colors: true, children: false, chunks: false, cached: false })).join('\n\n'));
-      resolve(this.generateStaticSite());
-    }
-  }
-
-  private generateStaticSite() {
-    return new Promise<void>((resolve, reject) => {
-      this.deleteHtmlFilesExceptTemplate();
-      this.executeGenerateStaticSiteScript(resolve, reject);
-    });
-  }
-
-  private deleteHtmlFilesExceptTemplate() {
-    const htmlFilePaths = globSync('**/*.html', { cwd: this.options.distPath })
-      .filter(htmlFilePath => htmlFilePath.includes(templateAssetName) === false);
-
-    for (const htmlFilePath of htmlFilePaths) {
-      unlinkSync(joinPaths(this.options.distPath, htmlFilePath));
-    }
-  }
-
-  private executeGenerateStaticSiteScript(resolve: () => void, reject: () => void) {
-    const templatePath = joinPaths(this.options.distPath, templateAssetName);
-    const scriptPath = joinPaths(this.options.distPath, generatorScriptAssetName);
-
-    if (existsSync(scriptPath)) {
-      console.log(`\n${chalk.gray.bold('ng-static-site-generator running...')}`);
-
-      const scriptProcess = fork(scriptPath);
-
-      scriptProcess.on('exit', code => {
-        if (this.watch === false) {
-          unlinkSync(scriptPath);
-          unlinkSync(templatePath);
-        }
-
-
-        if (code && code > 0) {
-          reject();
-        } else {
-          resolve();
-        }
-      });
-    } else {
+      this.printStats(multiStats);
       resolve();
+    }
+  }
+
+  private printStats(multiStats: MultiStats, error = false) {
+    let results: string;
+
+    if (error) {
+      results = multiStats.stats
+        .map(stats => stats.toString({ colors: true }))
+        .join('\n\n');
+    } else {
+      const assets = multiStats.stats
+        .map(stats => stats.toJson({ assets: true }).assets as StatsAsset[])
+        .reduce((prev, curr) => prev.concat(curr), [])
+        .filter(asset => asset.name.match(/temp|styles.*\.js/) === null);
+
+      results = assets.length ? WebpackStats.jsonToString({ assets }, true) : undefined;
+    }
+
+    if (results) {
+      console.log(results);
+    }
+  }
+
+  private deleteUnnecessaryArtifacts() {
+    if (this.watch === false) {
+      return del(['*temp*', 'styles*.js'], { cwd: this.options.distPath })
+        .then(() => void 0);
     }
   }
 }

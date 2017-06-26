@@ -5,12 +5,17 @@ const webpackNodeExternals = require('webpack-node-externals');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
 import { Options } from './../options';
-import { blogEntryPath, generatorScriptEntryPath } from './asset-names';
+import { blogHashName, blogHashPath, generatorScriptName, generatorScriptPath } from './asset-names';
 import { getTemplatePlugins } from './generate-client-app-webpack-config';
-import { getLoaders } from './get-loaders';
+import { getLoaders, LoaderOptions } from './get-loaders';
+import { NgStaticSiteGeneratorPlugin } from './ng-static-site-generator-plugin';
 
-export function generateStaticSiteWebpackConfig(options: Options, buildTemplate: boolean): webpack.Configuration {
-  const emitFiles = buildTemplate;
+export function generateStaticSiteWebpackConfig(options: Options, watch: boolean, buildTemplate: boolean): webpack.Configuration {
+  const loaderOptions: LoaderOptions = {
+    emitFiles: buildTemplate,
+    includeHash: watch === false
+  };
+
   const stylesEntry = buildTemplate ? { 'styles': options.stylesPath } : { };
 
   return {
@@ -19,7 +24,8 @@ export function generateStaticSiteWebpackConfig(options: Options, buildTemplate:
       webpackNodeExternals()
     ],
     entry: {
-      [generatorScriptEntryPath]: generatorScriptEntryPath,
+      [blogHashName]: blogHashPath,
+      [generatorScriptName]: generatorScriptPath,
       ...stylesEntry
     },
     output: {
@@ -30,19 +36,19 @@ export function generateStaticSiteWebpackConfig(options: Options, buildTemplate:
       extensions: ['.js', '.ts']
     },
     module: {
-      rules: getLoaders({ emitFiles, loadBlog: true })
+      rules: getLoaders(loaderOptions)
     },
     plugins: [
-      new webpack.ProgressPlugin(),
       new VirtualModuleWebpackPlugin({
-        moduleName: blogEntryPath,
+        moduleName: blogHashPath,
         contents: options.blogPath
       }),
       new VirtualModuleWebpackPlugin({
-        moduleName: generatorScriptEntryPath,
+        moduleName: generatorScriptPath,
         contents: generateEntryScript(options)
       }),
-      ...(buildTemplate ? getTemplatePlugins(options, ['styles']) : [])
+      ...(buildTemplate ? getTemplatePlugins(options, watch, ['styles']) : []),
+      new NgStaticSiteGeneratorPlugin(options)
     ]
   };
 }
@@ -61,10 +67,7 @@ import { ${appModule.name} } from '${appModule.path}';
 import { ${appComponent.name} } from '${appComponent.path}';
 import { ${appRoutes.name} } from '${appRoutes.path}';
 
-// This triggers the blog loader which adds a context dependency on the blog path for the watch build mode.
-const nothing = require('${blogEntryPath}');
-
-generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}', '${options.distPath}');`;
+generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}');`;
 }
 
 function parseModulePath(modulePath: string) {
