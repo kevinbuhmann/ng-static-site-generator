@@ -12,7 +12,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint --project tsconfig.json --type-check",
-    "prepublish": "npm run build",
+    "prepublish": "in-publish && npm run build || not-in-publish",
     "prebuild": "npm run clean && npm run lint",
     "build": "tsc --project tsconfig.json"
   },
@@ -61,6 +61,7 @@
     "@types/node": "8.0.1",
     "@types/rimraf": "0.0.28",
     "@types/webpack": "2.2.16",
+    "in-publish": "2.0.0",
     "reflect-metadata": "0.1.10",
     "rimraf": "2.6.1",
     "tslint": "4.5.1",
