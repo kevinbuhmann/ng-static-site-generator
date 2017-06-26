@@ -45,7 +45,7 @@ export class RendererBlogService implements IBlogService {
 
   private static parseBlogFileContents(filename: string, fileContents: string) {
     const parsedFilename = RendererBlogService.parseBlogFilename(filename);
-    const fileContentsMatch = /^---((?:.|\r|\n)+)---((?:.|\r|\n)+)$/g.exec(fileContents);
+    const fileContentsMatch = /^---(?:\r|\n)((?:.|\r|\n)+?)(?:\r|\n)---(?:\r|\n)((?:.|\r|\n)+)$/g.exec(fileContents);
 
     const date = parsedFilename.date;
     const url = `/blog/${date}/${parsedFilename.urlSlug}`;
