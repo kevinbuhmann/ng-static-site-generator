@@ -10,9 +10,9 @@ There is a [starter project](https://github.com/kevinphelps/ng-static-site-gener
 - [x] Build an Angular app and blog entries into a static html and css website.
 - [x] Build a client app to support dynamic functionality in the browser.
 - [x] Watch build mode to automatically rebuild the site after changes.
+- [x] Generate blog pages from source files written in markdown.
 - [ ] AOT build support for the client app to reduce bundle size.
 - [ ] Server for testing the website when developing and writing blog entries.
-- [ ] Generate blog pages from source files written in markdown.
 
 ## Installation
 
@@ -69,19 +69,21 @@ The following `peerDependencies` are required:
 
 `ng-static-site-generator` uses jekyll-style files for blog entries. Files are placed in the `blogPath` folder specifed in `ng-static-static-generator.json`. (Note: Nesting folders within the blog path is not yet supported.)
 
-- filename: `YYYY-MM-DD-url-slug.html` (e.g. `2017-06-26-this-is-a-blog-entry.html`)
-- file contents: Metadata is given at the top of file delimited by lines containing `---`. Everything after the second `---` is body content written in html. Example:
+- filename: `YYYY-MM-DD-url-slug.html` or `YYYY-MM-DD-url-slug.md` (e.g. `2017-06-26-this-is-a-blog-entry.html`)
+- file contents: Metadata is given at the top of file delimited by lines containing `---`. Everything after the second `---` is body conten written in html.
 
-```html
+Example:
+
+```markdown
 ---
 title: This is the Title of the Blog Entry
 description: This is a short description of the blog entry.
 customProperty: This is a custom property. (Optional, of course.)
 ---
 
-<h3>This is the Title of the Blog Entry</h3>
+##This is the Title of the Blog Entry
 
-<p>
-  This is the content of the blog entry.
-</p>
+This is the content of the blog entry.
+
+<p>You can also write content in html if you want.</p>
 ```

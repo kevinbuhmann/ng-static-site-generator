@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
 import { minifyHtml } from '../utilities/html-minify';
+import { renderMarkdownToHtml } from '../utilities/markdown';
 import { BlogEntry, BlogEntryMetadata, IBlogService } from './blog.service';
 
 export const BLOG_PATH = new InjectionToken<string>('BLOG_PATH');
@@ -19,7 +20,7 @@ export class RendererBlogService implements IBlogService {
   }
 
   getBlogEntry(date: string, urlSlug: string): Observable<BlogEntry> {
-    const filename = `${date}-${urlSlug}.html`;
+    const filename = `${date}-${urlSlug}`;
 
     return ArrayObservable.of(this.getBlogEntryByFilename(filename));
   }
@@ -28,14 +29,22 @@ export class RendererBlogService implements IBlogService {
     return readdirSync(this.blogPath).map(filename => this.getBlogEntryByFilename(filename));
   }
 
-  private getBlogEntryByFilename(filename: string) {
-    const fileContents = readFileSync(joinPaths(this.blogPath, filename)).toString();
+  private getBlogEntryByFilename(blogFilename: string) {
+    const filenames = [`${blogFilename}.md`, `${blogFilename}.html`];
 
-    return RendererBlogService.parseBlogFileContents(filename, fileContents);
+    const matchingFilenames = readdirSync(this.blogPath)
+      .filter(filename => filename === blogFilename || filenames.indexOf(filename) >= 0);
+
+    if (matchingFilenames.length === 1) {
+      const filename = matchingFilenames[0];
+      const fileContents = readFileSync(joinPaths(this.blogPath, filename)).toString();
+
+      return RendererBlogService.parseBlogFileContents(filename, fileContents);
+    }
   }
 
   private static parseBlogFilename(filename: string) {
-    const filenameMatch = /^([0-9]{4}-[0-9]{2}-[0-9]{2})-(.+).html$/g.exec(filename);
+    const filenameMatch = /^([0-9]{4}-[0-9]{2}-[0-9]{2})-(.+)\.(md|html)$/g.exec(filename);
 
     const date = filenameMatch[1];
     const urlSlug = filenameMatch[2];
@@ -47,10 +56,13 @@ export class RendererBlogService implements IBlogService {
     const parsedFilename = RendererBlogService.parseBlogFilename(filename);
     const fileContentsMatch = /^---(?:\r|\n)((?:.|\r|\n)+?)(?:\r|\n)---(?:\r|\n)((?:.|\r|\n)+)$/g.exec(fileContents);
 
+    const rawBody = fileContentsMatch[2].trim();
+    const html = filename.endsWith('.html') ? rawBody : renderMarkdownToHtml(rawBody);
+
     const date = parsedFilename.date;
     const url = `/blog/${date}/${parsedFilename.urlSlug}`;
     const metadata: BlogEntryMetadata = parseYaml(fileContentsMatch[1].trim());
-    const body = minifyHtml(fileContentsMatch[2].trim());
+    const body = minifyHtml(html);
 
     return { date, url, body, ...metadata } as BlogEntry;
   }

@@ -98,6 +98,10 @@
   version "3.5.31"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.5.31.tgz#54aeb8bcaaf94a7b1a64311bc318dbfe601a593a"
 
+"@types/marked@0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@types/marked/-/marked-0.0.28.tgz#44ba754e9fa51432583e8eb30a7c4dd249b52faa"
+
 "@types/minimatch@*":
   version "2.0.29"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-2.0.29.tgz#5002e14f75e2d71e564281df0431c8c1b4a2a36a"
@@ -1987,6 +1991,10 @@ make-dir@^1.0.0:
 map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
+
+marked@0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
 
 math-expression-evaluator@^1.2.14:
   version "1.2.17"
