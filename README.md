@@ -14,6 +14,32 @@ There is a [starter project](https://github.com/kevinphelps/ng-static-site-gener
 - [ ] Server for testing the website when developing and writing blog entries.
 - [ ] Generate blog pages from source files written in markdown.
 
+## Installation
+
+Clone [the starter project](https://github.com/kevinphelps/ng-static-site-generator-starter) tp get started fast!
+
+`yarn add [--exact] ng-static-site-generator` or `npm install --save-dev [--save-exact] ng-static-site-generator`
+
+The following `peerDependencies` are required:
+
+```json
+{
+  "dependencies": {
+    "@angular/animations": ">4.0.0",
+    "@angular/common": ">4.0.0",
+    "@angular/core": ">4.0.0",
+    "@angular/http": ">4.0.0",
+    "@angular/platform-browser": ">4.0.0",
+    "@angular/platform-server": ">4.0.0",
+    "@angular/router": ">4.0.0",
+    "reflect-metadata": ">0.1.0",
+    "rxjs": ">5.0.0",
+    "typescript": ">2.3.0",
+    "zone.js": ">0.8.0"
+  }
+}
+```
+
 ## CLI Commands
 
 - `ng-static-site-generator build`: Builds the static site.
