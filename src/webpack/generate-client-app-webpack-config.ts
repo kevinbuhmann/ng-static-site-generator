@@ -7,9 +7,8 @@ import * as webpack from 'webpack';
 const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 
 import { Options } from './../options';
+import { templateAssetName } from './asset-names';
 import { getLoaders } from './get-loaders';
-
-export const templateFilename = 'template.html';
 
 const nodeModules = joinPaths(process.cwd(), 'node_modules');
 const realNodeModules = realpathSync(nodeModules);
@@ -53,7 +52,7 @@ export function getTemplatePlugins(options: Options, chunks: string[]) {
     new HtmlWebpackPlugin({
       chunks,
       template: options.templatePath,
-      filename: templateFilename,
+      filename: templateAssetName,
       excludeAssets: [/style.*.js/]
     }),
     new HtmlWebpackExcludeAssetsPlugin()

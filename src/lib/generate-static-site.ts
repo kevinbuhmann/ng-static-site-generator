@@ -8,7 +8,7 @@ import { join as joinPaths } from 'path';
 import { BLOG_PATH, RendererBlogService } from './../services/renderer-blog.service';
 import { safeWriteFileSync } from './../utilities/fs.utilities';
 import { minifyHtml } from './../utilities/html-minify';
-import { templateFilename } from './../webpack/generate-client-app-webpack-config';
+import { templateAssetName } from './../webpack/asset-names';
 import { appRenderModuleFactory } from './app-renderer-module-factory';
 import { getRouteUrls } from './get-route-urls';
 
@@ -23,7 +23,7 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
   const injector = ReflectiveInjector.resolveAndCreate(providers);
   const blog: RendererBlogService = injector.get(RendererBlogService);
 
-  const template = readFileSync(joinPaths(distPath, templateFilename)).toString();
+  const template = readFileSync(joinPaths(distPath, templateAssetName)).toString();
   const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath);
 
   const output: string[] = [];

@@ -5,14 +5,9 @@ const webpackNodeExternals = require('webpack-node-externals');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
 import { Options } from './../options';
+import { blogEntryPath, generatorScriptEntryPath } from './asset-names';
 import { getTemplatePlugins } from './generate-client-app-webpack-config';
 import { getLoaders } from './get-loaders';
-
-export const generateStaticSiteScriptFilename = 'generate-static-site';
-const generateStaticSiteScriptPath = `./${generateStaticSiteScriptFilename}.ts`;
-
-const blogEntry = 'blog';
-const blogEntryPath = `./${blogEntry}.blog`;
 
 export function generateStaticSiteWebpackConfig(options: Options, buildTemplate: boolean): webpack.Configuration {
   const emitFiles = buildTemplate;
@@ -24,7 +19,7 @@ export function generateStaticSiteWebpackConfig(options: Options, buildTemplate:
       webpackNodeExternals()
     ],
     entry: {
-      [generateStaticSiteScriptFilename]: generateStaticSiteScriptPath,
+      [generatorScriptEntryPath]: generatorScriptEntryPath,
       ...stylesEntry
     },
     output: {
@@ -44,7 +39,7 @@ export function generateStaticSiteWebpackConfig(options: Options, buildTemplate:
         contents: options.blogPath
       }),
       new VirtualModuleWebpackPlugin({
-        moduleName: generateStaticSiteScriptPath,
+        moduleName: generatorScriptEntryPath,
         contents: generateEntryScript(options)
       }),
       ...(buildTemplate ? getTemplatePlugins(options, ['styles']) : [])

@@ -7,8 +7,7 @@ import * as webpack from 'webpack';
 
 import { Options } from './../options';
 import { MultiCompiler, MultiStats } from './../types/multi-webpack';
-import { templateFilename } from './../webpack/generate-client-app-webpack-config';
-import { generateStaticSiteScriptFilename } from './../webpack/generate-static-site-webpack-config';
+import { generatorScriptAssetName, templateAssetName } from './../webpack/asset-names';
 import { generateWebpackConfig } from './../webpack/generate-webpack-config';
 import { Task } from './task';
 
@@ -58,7 +57,7 @@ export class BuildTask implements Task {
 
   private deleteHtmlFilesExceptTemplate() {
     const htmlFilePaths = globSync('**/*.html', { cwd: this.options.distPath })
-      .filter(htmlFilePath => htmlFilePath.includes(templateFilename) === false);
+      .filter(htmlFilePath => htmlFilePath.includes(templateAssetName) === false);
 
     for (const htmlFilePath of htmlFilePaths) {
       unlinkSync(joinPaths(this.options.distPath, htmlFilePath));
@@ -66,8 +65,8 @@ export class BuildTask implements Task {
   }
 
   private executeGenerateStaticSiteScript(resolve: () => void, reject: () => void) {
-    const templatePath = joinPaths(this.options.distPath, templateFilename);
-    const scriptPath = joinPaths(this.options.distPath, `${generateStaticSiteScriptFilename}.js`);
+    const templatePath = joinPaths(this.options.distPath, templateAssetName);
+    const scriptPath = joinPaths(this.options.distPath, generatorScriptAssetName);
 
     if (existsSync(scriptPath)) {
       console.log(`\n${chalk.gray.bold('ng-static-site-generator running...')}`);
