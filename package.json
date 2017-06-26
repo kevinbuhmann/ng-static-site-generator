@@ -1,6 +1,6 @@
 {
   "name": "ng-static-site-generator",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "author": "Kevin Phelps <KevinPhelps11@gmail.com>",
   "license": "MIT",
   "description": "Static site generator for Angular",
