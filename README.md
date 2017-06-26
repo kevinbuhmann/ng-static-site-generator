@@ -44,12 +44,13 @@ There is a [starter project](https://github.com/kevinphelps/ng-static-site-gener
 `ng-static-site-generator` uses jekyll-style files for blog entries. Files are placed in the `blogPath` folder specifed in `ng-static-static-generator.json`. (Note: Nesting folders within the blog path is not yet supported.)
 
 - filename: `YYYY-MM-DD-url-slug.html` (e.g. `2017-06-26-this-is-a-blog-entry.html`)
-- file contents: Meta is given at the top of file delimited by lines containing `---`. Everything after the second `---` is body content written in html. Example:
+- file contents: Metadata is given at the top of file delimited by lines containing `---`. Everything after the second `---` is body content written in html. Example:
 
 ```html
 ---
 title: This is the Title of the Blog Entry
 description: This is a short description of the blog entry.
+customProperty: This is a custom property. (Optional, of course.)
 ---
 
 <h3>This is the Title of the Blog Entry</h3>
