@@ -1,7 +1,6 @@
 import * as chalk from 'chalk';
 import { fork } from 'child_process';
 import { createHash } from 'crypto';
-import * as del from 'del';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
@@ -47,18 +46,13 @@ export class NgStaticSiteGeneratorPlugin {
 
         NgStaticSiteGeneratorPlugin.lastHash = currentHash;
 
-        this.deleteHtmlFilesExceptTemplate()
-          .then(() => this.executeGeneratorScript(compilation))
+        this.executeGeneratorScript(compilation)
           .then(() => { callback(); })
           .catch(error => { callback(error); });
       } else {
         callback();
       }
     });
-  }
-
-  private deleteHtmlFilesExceptTemplate() {
-    return del(['**/*.html', `!**/${templateAssetName}`], { cwd: this.options.distPath });
   }
 
   private executeGeneratorScript(compilation: any) {
