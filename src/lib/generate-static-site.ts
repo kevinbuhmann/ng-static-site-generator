@@ -17,7 +17,7 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
   enableProdMode();
 
   const blog = new RendererBlogService(blogPath);
-  const blogEntries = blog.getBlogListSync();
+  const blogEntries = blog.getBlogListSync(true);
 
   const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath);
 

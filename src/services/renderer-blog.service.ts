@@ -25,11 +25,11 @@ export class RendererBlogService implements IBlogService {
     return ArrayObservable.of(this.getBlogEntryByFilename(filename));
   }
 
-  getBlogListSync() {
-    return readdirSync(this.blogPath).map(filename => this.getBlogEntryByFilename(filename));
+  getBlogListSync(setBody = false) {
+    return readdirSync(this.blogPath).map(filename => this.getBlogEntryByFilename(filename, setBody));
   }
 
-  private getBlogEntryByFilename(blogFilename: string) {
+  private getBlogEntryByFilename(blogFilename: string, setBody = true) {
     const filenames = [`${blogFilename}.md`, `${blogFilename}.html`];
 
     const matchingFilenames = readdirSync(this.blogPath)
@@ -39,7 +39,7 @@ export class RendererBlogService implements IBlogService {
       const filename = matchingFilenames[0];
       const fileContents = readFileSync(joinPaths(this.blogPath, filename)).toString();
 
-      return RendererBlogService.parseBlogFileContents(filename, fileContents);
+      return RendererBlogService.parseBlogFileContents(filename, fileContents, setBody);
     }
   }
 
@@ -52,18 +52,20 @@ export class RendererBlogService implements IBlogService {
     return { date, urlSlug };
   }
 
-  private static parseBlogFileContents(filename: string, fileContents: string) {
+  private static parseBlogFileContents(filename: string, fileContents: string, setBody: boolean) {
     const parsedFilename = RendererBlogService.parseBlogFilename(filename);
     const fileContentsMatch = /^---(?:\r|\n)((?:.|\r|\n)+?)(?:\r|\n)---(?:\r|\n)((?:.|\r|\n)+)$/g.exec(fileContents);
-
-    const rawBody = fileContentsMatch[2].trim();
-    const html = filename.endsWith('.html') ? rawBody : renderMarkdownToHtml(rawBody);
 
     const date = parsedFilename.date;
     const url = `/blog/${date}/${parsedFilename.urlSlug}`;
     const metadata: BlogEntryMetadata = parseYaml(fileContentsMatch[1].trim());
-    const body = minifyHtml(html);
+    const body = setBody ? RendererBlogService.processBody(filename, fileContentsMatch[2].trim()) : undefined;
 
     return { date, url, body, ...metadata } as BlogEntry;
+  }
+
+  private static processBody(filename: string, rawBody: string) {
+    const html = filename.endsWith('.html') ? rawBody : renderMarkdownToHtml(rawBody);
+    return minifyHtml(html);
   }
 }
