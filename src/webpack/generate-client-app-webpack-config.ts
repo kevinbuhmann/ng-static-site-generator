@@ -15,6 +15,8 @@ import { NgStaticSiteGeneratorPlugin } from './ng-static-site-generator-plugin';
 const nodeModules = joinPaths(process.cwd(), 'node_modules');
 const realNodeModules = realpathSync(nodeModules);
 
+const entryPoints = ['polyfills', 'vendor', 'main'];
+
 export function generateClientAppWebpackConfig(options: Options, watch: boolean): webpack.Configuration {
   const loaderOptions: LoaderOptions = {
     emitFiles: true,
@@ -65,7 +67,8 @@ export function getTemplatePlugins(options: Options, watch: boolean, chunks: str
       chunks,
       template: options.templatePath,
       filename: templateAssetName,
-      excludeAssets: [/style.*\.js/]
+      excludeAssets: [/style.*\.js/],
+      chunksSortMode: (left, right) => entryPoints.indexOf(left.names[0]) - entryPoints.indexOf(right.names[0])
     }),
     new HtmlWebpackExcludeAssetsPlugin()
   ];
