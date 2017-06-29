@@ -30,8 +30,10 @@ export class BuildTask implements Task {
   }
 
   private webpackCompilerCallback(error: Error, multiStats: MultiStats, resolve: () => void, reject: () => void) {
-    if (multiStats.hasErrors()) {
-      this.printStats(multiStats, true);
+    if (error || multiStats.hasErrors()) {
+      if (multiStats) {
+        this.printStats(multiStats, true);
+      }
 
       if (error) {
         console.log(error.toString());
