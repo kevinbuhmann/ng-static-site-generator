@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@angular/core';
 import { readdirSync, readFileSync } from 'fs';
 import { safeLoad as parseYaml } from 'js-yaml';
 import { join as joinPaths } from 'path';
@@ -6,10 +7,15 @@ import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
 import { minifyHtml } from '../utilities/html-minify';
 import { renderMarkdownToHtml } from '../utilities/markdown';
+import { GENERATOR_OPTIONS, PRODUCTION } from './../module/injection-tokens';
 import { BlogEntry, BlogEntryMetadata, IBlogService } from './../module/services/blog.service';
+import { GeneratorOptions } from './../options';
 
+@Injectable()
 export class RendererBlogService implements IBlogService {
-  constructor(private blogPath: string, private production: boolean) {
+  constructor(
+    @Inject(PRODUCTION) private production: boolean,
+    @Inject(GENERATOR_OPTIONS) private generatorOptions: GeneratorOptions) {
   }
 
   getBlogList(): Observable<BlogEntry[]> {
@@ -23,7 +29,7 @@ export class RendererBlogService implements IBlogService {
   }
 
   getBlogListSync(setBody = false) {
-    return readdirSync(this.blogPath)
+    return readdirSync(this.generatorOptions.blogPath)
       .map(filename => this.getBlogEntryByFilename(filename, setBody))
       .sort((entryA, entryB) => entryB.date.localeCompare(entryA.date));
   }
@@ -31,12 +37,12 @@ export class RendererBlogService implements IBlogService {
   private getBlogEntryByFilename(blogFilename: string, setBody = true) {
     const filenames = [`${blogFilename}.md`, `${blogFilename}.html`];
 
-    const matchingFilenames = readdirSync(this.blogPath)
+    const matchingFilenames = readdirSync(this.generatorOptions.blogPath)
       .filter(filename => filename === blogFilename || filenames.indexOf(filename) >= 0);
 
     if (matchingFilenames.length === 1) {
       const filename = matchingFilenames[0];
-      const fileContents = readFileSync(joinPaths(this.blogPath, filename)).toString();
+      const fileContents = readFileSync(joinPaths(this.generatorOptions.blogPath, filename)).toString();
 
       return this.parseBlogFileContents(filename, fileContents, setBody);
     }
