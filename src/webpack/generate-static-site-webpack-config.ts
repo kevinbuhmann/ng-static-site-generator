@@ -60,12 +60,6 @@ function generateEntryScript(options: Options, production: boolean) {
   const appModule = parseModulePath(options.appModule);
   const appComponent = parseModulePath(options.appComponent);
   const appRoutes = parseModulePath(options.appRoutes);
-  const postProcessBlogEntry = options.postProcessBlogEntry ? parseModulePath(options.postProcessBlogEntry) : undefined;
-
-  const postProcessBlogEntryFunctionName = '__postProcessBlogEntry';
-  const postProcessBlogEntryImport = postProcessBlogEntry ?
-    `import { ${postProcessBlogEntry.name} as ${postProcessBlogEntryFunctionName} } from '${postProcessBlogEntry.path}';` :
-    `function ${postProcessBlogEntryFunctionName}(blogEntry: any) { return blogEntry; }`;
 
   return `import 'reflect-metadata';
 import 'zone.js/dist/zone-node';
@@ -76,9 +70,7 @@ import { ${appModule.name} } from '${appModule.path}';
 import { ${appComponent.name} } from '${appComponent.path}';
 import { ${appRoutes.name} } from '${appRoutes.path}';
 
-${postProcessBlogEntryImport}
-
-generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}', ${production}, ${postProcessBlogEntryFunctionName});`;
+generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}', ${production});`;
 }
 
 function parseModulePath(modulePath: string) {
