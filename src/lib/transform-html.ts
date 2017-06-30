@@ -21,6 +21,19 @@ export function removeInnerHtmlAttributes(node: any) {
   }
 }
 
+export function makeExternalLinksTargetBlank(node: any) {
+  if (node.tagName === 'a') {
+    const linkElement = node as AST.Default.Element;
+    const targetAttr = linkElement.attrs.find(attr => attr.name === 'target');
+    const hrefAttr = linkElement.attrs.find(attr => attr.name === 'href');
+    const href = hrefAttr ? hrefAttr.value : undefined;
+
+    if (targetAttr === undefined && href && href.startsWith('http')) {
+      linkElement.attrs.push({ name: 'target', value: '_blank'});
+    }
+  }
+}
+
 function visitNode(node: any, visitors: NodeVisitor[]) {
   for (const visitor of visitors) {
     visitor(node);

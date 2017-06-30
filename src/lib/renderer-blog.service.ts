@@ -7,14 +7,17 @@ import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
 import { minifyHtml } from '../utilities/html-minify';
 import { renderMarkdownToHtml } from '../utilities/markdown';
-import { GENERATOR_OPTIONS, PRODUCTION } from './../module/injection-tokens';
+import { GENERATOR_OPTIONS, MODULE_OPTIONS, PRODUCTION } from './../module/injection-tokens';
 import { BlogEntry, BlogEntryMetadata, IBlogService } from './../module/services/blog.service';
 import { GeneratorOptions } from './../options';
+import { ModuleOptions } from './../options';
+import { makeExternalLinksTargetBlank, transformHtml } from './transform-html';
 
 @Injectable()
 export class RendererBlogService implements IBlogService {
   constructor(
     @Inject(PRODUCTION) private production: boolean,
+    @Inject(MODULE_OPTIONS) private moduleOptions: ModuleOptions,
     @Inject(GENERATOR_OPTIONS) private generatorOptions: GeneratorOptions) {
   }
 
@@ -70,7 +73,12 @@ export class RendererBlogService implements IBlogService {
   }
 
   private processBody(filename: string, rawBody: string) {
-    const html = filename.endsWith('.html') ? rawBody : renderMarkdownToHtml(rawBody);
+    let html = filename.endsWith('.html') ? rawBody : renderMarkdownToHtml(rawBody);
+
+    if (this.moduleOptions.openExternalLinksInNewTab) {
+      html = transformHtml(html, [makeExternalLinksTargetBlank]);
+    }
+
     return this.production ? minifyHtml(html) : html;
   }
 }

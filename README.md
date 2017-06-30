@@ -72,12 +72,17 @@ The following `peerDependencies` are required:
 
 ```typescript
 // app.module.ts
-import { NgStaticSiteGeneratorModule } from 'ng-static-site-generator';
+import { ModuleOptions, NgStaticSiteGeneratorModule } from 'ng-static-site-generator';
+
+const ngStaticSiteGeneratorModuleOptions: ModuleOptions = {
+  openExternalLinksInNewTab: false // Automatically add target="_blank" to external links. Default false.
+};
+
 
 @NgModule({
   imports: [
     ...
-    NgStaticSiteGeneratorModule
+    NgStaticSiteGeneratorModule.forRoot(ngStaticSiteGeneratorModuleOptions)
   ],
   ...
 })

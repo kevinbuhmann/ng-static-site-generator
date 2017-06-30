@@ -1,3 +1,7 @@
+export interface ModuleOptions {
+  openExternalLinksInNewTab?: boolean;
+}
+
 export interface GeneratorOptions {
   appModule: string;
   appComponent: string;
