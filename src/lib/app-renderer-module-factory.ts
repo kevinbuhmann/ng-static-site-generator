@@ -4,8 +4,8 @@ import { ServerModule } from '@angular/platform-server';
 import { BlogService } from './../services/blog.service';
 import { RendererBlogService } from './../services/renderer-blog.service';
 
-export function appRenderModuleFactory<M, C>(appModule: Type<M>, appComponent: Type<C>, blogPath: string): Type<any> {
-  const blogService = new RendererBlogService(blogPath);
+export function appRenderModuleFactory<M, C>(appModule: Type<M>, appComponent: Type<C>, blogPath: string, production: boolean): Type<any> {
+  const blogService = new RendererBlogService(blogPath, production);
 
   @NgModule({
     imports: [

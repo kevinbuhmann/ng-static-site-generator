@@ -13,13 +13,13 @@ export interface RenderedFile {
   contents: string;
 }
 
-export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, blogPath: string) {
+export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, blogPath: string, production: boolean) {
   enableProdMode();
 
-  const blog = new RendererBlogService(blogPath);
+  const blog = new RendererBlogService(blogPath, production);
   const blogEntries = blog.getBlogListSync(true);
 
-  const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath);
+  const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath, production);
 
   const files: RenderedFile[] = [];
 
@@ -56,7 +56,7 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
 
   function renderPage<M>(url: string, document: string) {
     return renderModule(appRendererModule, { url, document })
-      .then(html => minifyHtml(html))
+      .then(html => production ? minifyHtml(html) : html)
       .then(html => {
         const urlWithFilename = url.endsWith('/') ? `${url}index.html` : `${url}.html`;
         files.push({ path: urlWithFilename.substr(1), contents: html });

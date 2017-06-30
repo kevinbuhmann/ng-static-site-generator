@@ -10,4 +10,7 @@ export interface Options {
   /* Options for client app. If mainPath is not set, the client app will not be set. polyfillsPath is optional. */
   mainPath?: string;
   polyfillsPath?: string;
+  tsConfigPath?: string;
+  environmentSource?: string;
+  environments?: { [environment: string]: string };
 }

@@ -9,7 +9,7 @@ import { renderMarkdownToHtml } from '../utilities/markdown';
 import { BlogEntry, BlogEntryMetadata, IBlogService } from './blog.service';
 
 export class RendererBlogService implements IBlogService {
-  constructor(private blogPath: string) {
+  constructor(private blogPath: string, private production: boolean) {
   }
 
   getBlogList(): Observable<BlogEntry[]> {
@@ -36,11 +36,11 @@ export class RendererBlogService implements IBlogService {
       const filename = matchingFilenames[0];
       const fileContents = readFileSync(joinPaths(this.blogPath, filename)).toString();
 
-      return RendererBlogService.parseBlogFileContents(filename, fileContents, setBody);
+      return this.parseBlogFileContents(filename, fileContents, setBody);
     }
   }
 
-  private static parseBlogFilename(filename: string) {
+  private parseBlogFilename(filename: string) {
     const filenameMatch = /^([0-9]{4}-[0-9]{2}-[0-9]{2})-(.+)\.(md|html)$/g.exec(filename);
 
     const date = filenameMatch[1];
@@ -49,20 +49,20 @@ export class RendererBlogService implements IBlogService {
     return { date, urlSlug };
   }
 
-  private static parseBlogFileContents(filename: string, fileContents: string, setBody: boolean) {
-    const parsedFilename = RendererBlogService.parseBlogFilename(filename);
+  private parseBlogFileContents(filename: string, fileContents: string, setBody: boolean) {
+    const parsedFilename = this.parseBlogFilename(filename);
     const fileContentsMatch = /^---(?:\r|\n)((?:.|\r|\n)+?)(?:\r|\n)---(?:\r|\n)((?:.|\r|\n)+)$/g.exec(fileContents);
 
     const date = parsedFilename.date;
     const url = `/blog/${date}/${parsedFilename.urlSlug}`;
     const metadata: BlogEntryMetadata = parseYaml(fileContentsMatch[1].trim());
-    const body = setBody ? RendererBlogService.processBody(filename, fileContentsMatch[2].trim()) : undefined;
+    const body = setBody ? this.processBody(filename, fileContentsMatch[2].trim()) : undefined;
 
     return { date, url, body, ...metadata } as BlogEntry;
   }
 
-  private static processBody(filename: string, rawBody: string) {
+  private processBody(filename: string, rawBody: string) {
     const html = filename.endsWith('.html') ? rawBody : renderMarkdownToHtml(rawBody);
-    return minifyHtml(html);
+    return this.production ? minifyHtml(html) : html;
   }
 }

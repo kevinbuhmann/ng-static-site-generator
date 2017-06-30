@@ -3,6 +3,8 @@ import * as ExtractTextPlugin from 'extract-text-webpack-plugin';
 import { blogHashName } from './asset-names';
 
 export interface LoaderOptions {
+  client: boolean;
+  production: boolean;
   emitFiles: boolean;
   includeHash: boolean;
 }
@@ -13,7 +15,7 @@ export function getLoaders(options: LoaderOptions): any[] {
   return [
     {
       test: /\.ts$/,
-      use: ['awesome-typescript-loader', 'angular2-template-loader']
+      use: options.client ? ['@ngtools/webpack'] : ['awesome-typescript-loader', 'angular2-template-loader']
     },
     {
       test: /\.html$/,
@@ -30,7 +32,7 @@ export function getLoaders(options: LoaderOptions): any[] {
     },
     {
       test: /styles\.scss$/,
-      use: ExtractTextPlugin.extract({ fallback: 'style-loader',  use: ['css-loader', 'sass-loader'] })
+      use: options.production ? ExtractTextPlugin.extract({ fallback: 'style-loader',  use: ['css-loader', 'sass-loader'] }) : ['style-loader', 'css-loader', 'sass-loader']
     },
     {
       test: /\.(eot|svg)$/,

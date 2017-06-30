@@ -5,13 +5,15 @@ import * as program from 'commander';
 import { readFileSync } from 'fs';
 
 import { Options } from './options';
-import { BuildTask } from './tasks/build.task';
+import { BuildMode, BuildTask } from './tasks/build.task';
 import { Task } from './tasks/task';
 
 const options: Options = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
 
-registerCommand('build', 'Builds the static site.', () => new BuildTask(options, false));
-registerCommand('watch', 'Builds the static site and rebuilds after changes.', () => new BuildTask(options, true));
+registerCommand('build', 'Builds the static site.', build)
+  .option('--prod', 'Production build.');
+
+registerCommand('watch', 'Builds the static site and rebuilds after changes.', watch);
 
 program.parse(process.argv);
 
@@ -27,9 +29,18 @@ if (process.argv.slice(2).length === 0) {
   }
 }
 
-function registerCommand<TTask extends Task>(command: string, description: string, task: (...args: any[]) => TTask) {
-  program
+function build(flags: { prod: boolean }) {
+  const buildMode = flags.prod ? BuildMode.ProductionBuild : BuildMode.Build;
+  return new BuildTask(buildMode, options);
+}
+
+function watch() {
+  return new BuildTask(BuildMode.Watch, options);
+}
+
+function registerCommand<TTask extends Task>(command: string, description: string, task: (flags: any) => TTask) {
+  return program
     .command(command)
     .description(description)
-    .action((...args: any[]) => task(...args).run().catch(() => { process.exit(1); }));
+    .action((flags: any) => task(flags).run().catch(() => { process.exit(1); }));
 }

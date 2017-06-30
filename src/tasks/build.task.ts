@@ -8,8 +8,20 @@ import { Task } from './task';
 
 const WebpackStats = require('webpack/lib/Stats');
 
+export enum BuildMode {
+  Build,
+  Watch,
+  ProductionBuild
+}
+
 export class BuildTask implements Task {
-  constructor(private options: Options, private watch: boolean) { }
+  readonly watch: boolean;
+  readonly production: boolean;
+
+  constructor(mode: BuildMode, private options: Options) {
+    this.watch = mode === BuildMode.Watch;
+    this.production = mode === BuildMode.ProductionBuild;
+  }
 
   run() {
     return this.runWebpackBuild()
@@ -17,7 +29,7 @@ export class BuildTask implements Task {
   }
 
   private runWebpackBuild() {
-    const webpackConfig = generateWebpackConfig(this.options, this.watch);
+    const webpackConfig = generateWebpackConfig(this.options, this.watch, this.production);
     const webpackCompiler: MultiCompiler = webpack(webpackConfig);
 
     return new Promise<void>((resolve, reject) => {
@@ -54,10 +66,12 @@ export class BuildTask implements Task {
         .map(stats => stats.toString({ colors: true }))
         .join('\n\n');
     } else {
+      const excludePattern = this.production ? /temp|styles.*\.js/ : /temp/;
+
       const assets = multiStats.stats
         .map(stats => stats.toJson({ assets: true }).assets as StatsAsset[])
         .reduce((prev, curr) => prev.concat(curr), [])
-        .filter(asset => asset.name.match(/temp|styles.*\.js/) === null);
+        .filter(asset => asset.name.match(excludePattern) === null);
 
       results = assets.length ? WebpackStats.jsonToString({ assets }, true) : undefined;
     }
@@ -69,7 +83,12 @@ export class BuildTask implements Task {
 
   private deleteUnnecessaryArtifacts() {
     if (this.watch === false) {
-      return del(['*temp*', 'styles*.js'], { cwd: this.options.distPath })
+      const filesToDelete = [
+        '*temp*',
+        ...(this.production ? ['styles*.js'] : [])
+      ];
+
+      return del(filesToDelete, { cwd: this.options.distPath })
         .then(() => void 0);
     }
   }

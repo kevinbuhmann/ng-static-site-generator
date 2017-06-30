@@ -10,8 +10,10 @@ import { getTemplatePlugins } from './generate-client-app-webpack-config';
 import { getLoaders, LoaderOptions } from './get-loaders';
 import { NgStaticSiteGeneratorPlugin } from './ng-static-site-generator-plugin';
 
-export function generateStaticSiteWebpackConfig(options: Options, watch: boolean, buildTemplate: boolean): webpack.Configuration {
+export function generateStaticSiteWebpackConfig(options: Options, watch: boolean, production: boolean, buildTemplate: boolean): webpack.Configuration {
   const loaderOptions: LoaderOptions = {
+    production,
+    client: false,
     emitFiles: buildTemplate,
     includeHash: watch === false
   };
@@ -45,15 +47,16 @@ export function generateStaticSiteWebpackConfig(options: Options, watch: boolean
       }),
       new VirtualModuleWebpackPlugin({
         moduleName: generatorScriptPath,
-        contents: generateEntryScript(options)
+        contents: generateEntryScript(options, production)
       }),
-      ...(buildTemplate ? getTemplatePlugins(options, watch, ['styles']) : []),
+      ...(production ? [new webpack.NoEmitOnErrorsPlugin()] : []),
+      ...(buildTemplate ? getTemplatePlugins(options, watch, production, ['styles']) : []),
       new NgStaticSiteGeneratorPlugin(options)
     ]
   };
 }
 
-function generateEntryScript(options: Options) {
+function generateEntryScript(options: Options, production: boolean) {
   const appModule = parseModulePath(options.appModule);
   const appComponent = parseModulePath(options.appComponent);
   const appRoutes = parseModulePath(options.appRoutes);
@@ -67,7 +70,7 @@ import { ${appModule.name} } from '${appModule.path}';
 import { ${appComponent.name} } from '${appComponent.path}';
 import { ${appRoutes.name} } from '${appRoutes.path}';
 
-generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}');`;
+generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}', ${production});`;
 }
 
 function parseModulePath(modulePath: string) {
