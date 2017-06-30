@@ -11,7 +11,7 @@ There is a [starter project](https://github.com/kevinphelps/ng-static-site-gener
 - [x] Build a client app to support dynamic functionality in the browser.
 - [x] Watch build mode to automatically rebuild the site after changes.
 - [x] Generate blog pages from source files written in markdown.
-- [ ] AOT build support for the client app to reduce bundle size.
+- [x] AOT build support for the client app to reduce bundle size.
 - [ ] Server for testing the website when developing and writing blog entries. (`firebase serve` is a good alternative.)
 
 ## Installation
@@ -43,6 +43,7 @@ The following `peerDependencies` are required:
 ## CLI Commands
 
 - `ng-static-site-generator build`: Builds the static site.
+- `ng-static-site-generator build --prod`: Builds the static site for production (AOT compilation, minify js and html).
 - `ng-static-site-generator watch`: Builds the static site and rebuilds after changes.
 
 ## Configuration
