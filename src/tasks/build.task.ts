@@ -1,7 +1,7 @@
 import * as del from 'del';
 import * as webpack from 'webpack';
 
-import { Options } from './../options';
+import { GeneratorOptions } from './../options';
 import { MultiCompiler, MultiStats, StatsAsset } from './../types/webpack';
 import { generateWebpackConfig } from './../webpack/generate-webpack-config';
 import { Task } from './task';
@@ -18,7 +18,7 @@ export class BuildTask implements Task {
   readonly watch: boolean;
   readonly production: boolean;
 
-  constructor(mode: BuildMode, private options: Options) {
+  constructor(mode: BuildMode, private options: GeneratorOptions) {
     this.watch = mode === BuildMode.Watch;
     this.production = mode === BuildMode.ProductionBuild;
   }

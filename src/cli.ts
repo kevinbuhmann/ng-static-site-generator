@@ -4,11 +4,11 @@ import * as chalk from 'chalk';
 import * as program from 'commander';
 import { readFileSync } from 'fs';
 
-import { Options } from './options';
+import { GeneratorOptions } from './options';
 import { BuildMode, BuildTask } from './tasks/build.task';
 import { Task } from './tasks/task';
 
-const options: Options = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
+const options: GeneratorOptions = JSON.parse(readFileSync('./ng-static-site-generator.json').toString());
 
 registerCommand('build', 'Builds the static site.', build)
   .option('--prod', 'Production build.');

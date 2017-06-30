@@ -4,13 +4,13 @@ import * as webpack from 'webpack';
 const webpackNodeExternals = require('webpack-node-externals');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
-import { Options } from './../options';
+import { GeneratorOptions } from './../options';
 import { blogHashName, blogHashPath, generatorScriptName, generatorScriptPath } from './asset-names';
 import { getTemplatePlugins } from './generate-client-app-webpack-config';
 import { getLoaders, LoaderOptions } from './get-loaders';
 import { NgStaticSiteGeneratorPlugin } from './ng-static-site-generator-plugin';
 
-export function generateStaticSiteWebpackConfig(options: Options, watch: boolean, production: boolean, buildTemplate: boolean): webpack.Configuration {
+export function generateStaticSiteWebpackConfig(options: GeneratorOptions, watch: boolean, production: boolean, buildTemplate: boolean): webpack.Configuration {
   const loaderOptions: LoaderOptions = {
     production,
     client: false,
@@ -56,7 +56,7 @@ export function generateStaticSiteWebpackConfig(options: Options, watch: boolean
   };
 }
 
-function generateEntryScript(options: Options, production: boolean) {
+function generateEntryScript(options: GeneratorOptions, production: boolean) {
   const appModule = parseModulePath(options.appModule);
   const appComponent = parseModulePath(options.appComponent);
   const appRoutes = parseModulePath(options.appRoutes);

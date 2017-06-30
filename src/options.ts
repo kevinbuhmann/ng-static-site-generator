@@ -1,4 +1,4 @@
-export interface Options {
+export interface GeneratorOptions {
   appModule: string;
   appComponent: string;
   appRoutes: string;

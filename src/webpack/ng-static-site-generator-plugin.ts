@@ -4,7 +4,7 @@ import { createHash } from 'crypto';
 import { join as joinPaths } from 'path';
 import * as webpack from 'webpack';
 
-import { Options } from '../options';
+import { GeneratorOptions } from '../options';
 import { RenderedFile } from './../lib/generate-static-site';
 import { safeWriteFileSync } from './../utilities/fs.utilities';
 import { blogHashAssetName, generatorScriptAssetName, templateAssetName } from './asset-names';
@@ -16,7 +16,7 @@ export class NgStaticSiteGeneratorPlugin {
   private static lastHash: string;
   private static targetCompiler: webpack.Compiler;
 
-  constructor(private options: Options) {}
+  constructor(private options: GeneratorOptions) {}
 
   apply(compiler: webpack.Compiler) {
     compiler.plugin('emit', (compilation, callback) => {

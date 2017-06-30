@@ -8,7 +8,7 @@ import * as webpack from 'webpack';
 const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 const VirtualModuleWebpackPlugin = require('virtual-module-webpack-plugin');
 
-import { Options } from './../options';
+import { GeneratorOptions } from './../options';
 import { blogHashName, blogHashPath, templateAssetName } from './asset-names';
 import { getLoaders, LoaderOptions } from './get-loaders';
 import { NgStaticSiteGeneratorPlugin } from './ng-static-site-generator-plugin';
@@ -18,7 +18,7 @@ const realNodeModules = realpathSync(nodeModules);
 
 const entryPoints = ['polyfills', 'styles', 'vendor', 'main'];
 
-export function generateClientAppWebpackConfig(options: Options, watch: boolean, production: boolean): webpack.Configuration {
+export function generateClientAppWebpackConfig(options: GeneratorOptions, watch: boolean, production: boolean): webpack.Configuration {
   const loaderOptions: LoaderOptions = {
     production,
     client: true,
@@ -74,7 +74,7 @@ export function generateClientAppWebpackConfig(options: Options, watch: boolean,
   };
 }
 
-export function getTemplatePlugins(options: Options, watch: boolean, production: boolean, chunks: string[]) {
+export function getTemplatePlugins(options: GeneratorOptions, watch: boolean, production: boolean, chunks: string[]) {
   return [
     ...(production ? [new ExtractTextPlugin(watch ? 'style.css' : 'styles.[hash].css')] : []),
     new HtmlWebpackPlugin({

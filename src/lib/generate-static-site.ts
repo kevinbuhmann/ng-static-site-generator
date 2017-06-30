@@ -3,7 +3,7 @@ import { renderModule } from '@angular/platform-server';
 import { Routes } from '@angular/router';
 
 import { BlogEntry } from './../module/services/blog.service';
-import { Options } from './../options';
+import { GeneratorOptions } from './../options';
 import { minifyHtml } from './../utilities/html-minify';
 import { appRenderModuleFactory } from './app-renderer-module-factory';
 import { getRouteUrls } from './get-route-urls';
@@ -15,7 +15,7 @@ export interface RenderedFile {
   contents: string;
 }
 
-export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, options: Options, production: boolean) {
+export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, options: GeneratorOptions, production: boolean) {
   enableProdMode();
 
   const blog = new RendererBlogService(options.blogPath, production);
