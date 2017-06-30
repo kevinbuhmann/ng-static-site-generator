@@ -8,6 +8,7 @@ import { RendererBlogService } from './../services/renderer-blog.service';
 import { minifyHtml } from './../utilities/html-minify';
 import { appRenderModuleFactory } from './app-renderer-module-factory';
 import { getRouteUrls } from './get-route-urls';
+import { removeInnerHtmlAttributes, transformHtml } from './transform-html';
 
 export interface RenderedFile {
   path: string;
@@ -56,7 +57,12 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
   }
 
   function renderPage<M>(url: string, document: string) {
+    const visitors = [
+      removeInnerHtmlAttributes
+    ];
+
     return renderModule(appRendererModule, { url, document })
+      .then(html => transformHtml(html, visitors))
       .then(html => production ? minifyHtml(html) : html)
       .then(html => {
         const urlWithFilename = url.endsWith('/') ? `${url}index.html` : `${url}.html`;
