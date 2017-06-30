@@ -1,6 +1,6 @@
 import { AotPlugin } from '@ngtools/webpack';
 import * as ExtractTextPlugin from 'extract-text-webpack-plugin';
-import { readFileSync, realpathSync } from 'fs';
+import { realpathSync } from 'fs';
 import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import { join as joinPaths, resolve } from 'path';
 import * as webpack from 'webpack';
