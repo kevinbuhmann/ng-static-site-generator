@@ -33,11 +33,11 @@ export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<
 
   renderBlogJsonFiles();
 
-  readStandardInput()
+  getTemplate()
     .then(template => Promise.all(urls.map(url => renderPage(url, template))))
     .then(() => { exit(); }, error => { exit(error); });
 
-  function readStandardInput() {
+  function getTemplate() {
     return new Promise<string>(resolve => {
       process.on('message', message => {
         if (message.template) {
