@@ -6,7 +6,7 @@ import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 
 import { minifyHtml } from '../utilities/html-minify';
 import { renderMarkdownToHtml } from '../utilities/markdown';
-import { BlogEntry, BlogEntryMetadata, IBlogService } from './blog.service';
+import { BlogEntry, BlogEntryMetadata, IBlogService } from './../module/services/blog.service';
 
 export class RendererBlogService implements IBlogService {
   constructor(private blogPath: string, private production: boolean) {

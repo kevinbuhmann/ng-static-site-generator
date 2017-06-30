@@ -2,12 +2,12 @@ import { enableProdMode, Type } from '@angular/core';
 import { renderModule } from '@angular/platform-server';
 import { Routes } from '@angular/router';
 
+import { BlogEntry } from './../module/services/blog.service';
 import { Options } from './../options';
-import { BlogEntry } from './../services/blog.service';
-import { RendererBlogService } from './../services/renderer-blog.service';
 import { minifyHtml } from './../utilities/html-minify';
 import { appRenderModuleFactory } from './app-renderer-module-factory';
 import { getRouteUrls } from './get-route-urls';
+import { RendererBlogService } from './renderer-blog.service';
 import { removeInnerHtmlAttributes, transformHtml } from './transform-html';
 
 export interface RenderedFile {

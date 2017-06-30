@@ -66,6 +66,36 @@ The following `peerDependencies` are required:
 }
 ```
 
+## Using the NgStaticSiteGeneratorModule
+
+`ng-static-static-generator` exposes functionality via the `NgStaticSiteGeneratorModule`.
+
+```typescript
+// app.module.ts
+import { NgStaticSiteGeneratorModule } from 'ng-static-site-generator';
+
+@NgModule({
+  imports: [
+    ...
+    NgStaticSiteGeneratorModule
+  ],
+  ...
+})
+export class AppModule { }
+
+// my-component.ts
+import { BlogService } from 'ng-static-site-generator';
+
+@Component({
+  selector: 'app-my-component',
+  templateUrl: './my-component.component.html',
+  styleUrls: ['./my-component.component.scss']
+})
+export class MyComponent {
+  constructor(private blogService: BlogService) { }
+}
+```
+
 ## Blog entry source files
 
 `ng-static-site-generator` uses jekyll-style files for blog entries. Files are placed in the `blogPath` folder specifed in `ng-static-static-generator.json`. (Note: Nesting folders within the blog path is not yet supported.)

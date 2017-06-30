@@ -10,11 +10,16 @@
     "ng-static-site-generator": "dist/cli.js"
   },
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "run-s -n clean:*",
+    "clean:pre": "rimraf dist",
+    "clean:post": "rimraf src/**/*.ngsummary.json src/**/*.ngfactory.ts",
     "lint": "tslint --project tsconfig.json --type-check",
     "prepublish": "in-publish && npm run build || not-in-publish",
-    "prebuild": "npm run clean && npm run lint",
-    "build": "tsc --project tsconfig.json"
+    "prebuild": "run-s -n clean:pre lint",
+    "postbuild": "run-s -n clean:post",
+    "build": "run-s -n build:*",
+    "build:ngc": "ngc -p tsconfig.ngc.json",
+    "build:tsc": "tsc -p tsconfig.tsc.json"
   },
   "peerDependencies": {
     "@angular/animations": ">4.0.0",
@@ -82,6 +87,7 @@
     "@types/rimraf": "0.0.28",
     "@types/webpack": "2.2.16",
     "in-publish": "2.0.0",
+    "npm-run-all": "4.0.2",
     "reflect-metadata": "0.1.10",
     "rimraf": "2.6.1",
     "rxjs": "5.4.1",

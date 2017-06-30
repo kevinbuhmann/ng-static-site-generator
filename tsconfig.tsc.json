@@ -9,6 +9,13 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
-    "noImplicitAny": true
-  }
+    "noImplicitAny": true,
+    "outDir": "./dist",
+    "newLine": "LF"
+  },
+  "files": [
+    "./src/cli.ts",
+    "./src/webpack/blog-hash-loader.ts",
+    "./src/lib/generate-static-site.ts"
+  ]
 }
