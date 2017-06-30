@@ -8,9 +8,13 @@ import { minifyHtml } from '../utilities/html-minify';
 import { renderMarkdownToHtml } from '../utilities/markdown';
 import { BlogEntry, BlogEntryMetadata, IBlogService } from './blog.service';
 
+export type PostProcessBlogEntryFunction = (blogEntry: BlogEntry) => BlogEntry;
+
 export class RendererBlogService implements IBlogService {
-  constructor(private blogPath: string, private production: boolean) {
-  }
+  constructor(
+    private blogPath: string,
+    private production: boolean,
+    private postProcessBlogEntry: PostProcessBlogEntryFunction) { }
 
   getBlogList(): Observable<BlogEntry[]> {
     return ArrayObservable.of(this.getBlogListSync());
@@ -60,7 +64,7 @@ export class RendererBlogService implements IBlogService {
     const metadata: BlogEntryMetadata = parseYaml(fileContentsMatch[1].trim());
     const body = setBody ? this.processBody(filename, fileContentsMatch[2].trim()) : undefined;
 
-    return { date, url, body, ...metadata } as BlogEntry;
+    return this.postProcessBlogEntry({ date, url, body, ...metadata });
   }
 
   private processBody(filename: string, rawBody: string) {

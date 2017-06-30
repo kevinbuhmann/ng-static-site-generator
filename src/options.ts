@@ -6,6 +6,7 @@ export interface Options {
   blogPath: string;
   stylesPath: string;
   templatePath: string;
+  postProcessBlogEntry?: string;
 
   /* Options for client app. If mainPath is not set, the client app will not be set. polyfillsPath is optional. */
   mainPath?: string;

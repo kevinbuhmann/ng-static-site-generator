@@ -3,7 +3,7 @@ import { renderModule } from '@angular/platform-server';
 import { Routes } from '@angular/router';
 
 import { BlogEntry } from './../services/blog.service';
-import { RendererBlogService } from './../services/renderer-blog.service';
+import { PostProcessBlogEntryFunction, RendererBlogService } from './../services/renderer-blog.service';
 import { minifyHtml } from './../utilities/html-minify';
 import { appRenderModuleFactory } from './app-renderer-module-factory';
 import { getRouteUrls } from './get-route-urls';
@@ -13,13 +13,19 @@ export interface RenderedFile {
   contents: string;
 }
 
-export function generateStaticSite<M, C>(appModule: Type<M>, appComponent: Type<C>, routes: Routes, blogPath: string, production: boolean) {
+export function generateStaticSite<M, C>(
+  appModule: Type<M>,
+  appComponent: Type<C>,
+  routes: Routes,
+  blogPath: string,
+  production: boolean,
+  postProcessblogEntry: PostProcessBlogEntryFunction) {
   enableProdMode();
 
-  const blog = new RendererBlogService(blogPath, production);
+  const blog = new RendererBlogService(blogPath, production, postProcessblogEntry);
   const blogEntries = blog.getBlogListSync(true);
 
-  const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath, production);
+  const appRendererModule = appRenderModuleFactory(appModule, appComponent, blogPath, production, postProcessblogEntry);
 
   const files: RenderedFile[] = [];
 
