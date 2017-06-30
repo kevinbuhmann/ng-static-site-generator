@@ -1,4 +1,3 @@
-import { InjectionToken } from '@angular/core';
 import { readdirSync, readFileSync } from 'fs';
 import { safeLoad as parseYaml } from 'js-yaml';
 import { join as joinPaths } from 'path';
@@ -8,8 +7,6 @@ import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
 import { minifyHtml } from '../utilities/html-minify';
 import { renderMarkdownToHtml } from '../utilities/markdown';
 import { BlogEntry, BlogEntryMetadata, IBlogService } from './blog.service';
-
-export const BLOG_PATH = new InjectionToken<string>('BLOG_PATH');
 
 export class RendererBlogService implements IBlogService {
   constructor(private blogPath: string) {

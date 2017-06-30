@@ -1,24 +1,19 @@
-import { NgModule, Provider, Type } from '@angular/core';
+import { NgModule, Type } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 
 import { BlogService } from './../services/blog.service';
-import { BLOG_PATH, RendererBlogService } from './../services/renderer-blog.service';
-
-const rendererBlogServiceProvider: Provider = {
-  provide: BlogService,
-  useFactory: (distPath: string) => new RendererBlogService(distPath),
-  deps: [BLOG_PATH]
-};
+import { RendererBlogService } from './../services/renderer-blog.service';
 
 export function appRenderModuleFactory<M, C>(appModule: Type<M>, appComponent: Type<C>, blogPath: string): Type<any> {
+  const blogService = new RendererBlogService(blogPath);
+
   @NgModule({
     imports: [
       appModule,
       ServerModule
     ],
     providers: [
-      rendererBlogServiceProvider,
-      { provide: BLOG_PATH, useValue: blogPath }
+      { provide: BlogService, useValue: blogService }
     ],
     bootstrap: [
       appComponent
