@@ -23,7 +23,9 @@ export class RendererBlogService implements IBlogService {
   }
 
   getBlogListSync(setBody = false) {
-    return readdirSync(this.blogPath).map(filename => this.getBlogEntryByFilename(filename, setBody));
+    return readdirSync(this.blogPath)
+      .map(filename => this.getBlogEntryByFilename(filename, setBody))
+      .sort((entryA, entryB) => entryB.date.localeCompare(entryA.date));
   }
 
   private getBlogEntryByFilename(blogFilename: string, setBody = true) {
