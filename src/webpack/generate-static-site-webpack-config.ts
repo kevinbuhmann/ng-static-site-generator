@@ -70,7 +70,7 @@ import { ${appModule.name} } from '${appModule.path}';
 import { ${appComponent.name} } from '${appComponent.path}';
 import { ${appRoutes.name} } from '${appRoutes.path}';
 
-generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, '${options.blogPath}', ${production});`;
+generateStaticSite(${appModule.name}, ${appComponent.name}, ${appRoutes.name}, ${JSON.stringify(options)}, ${production});`;
 }
 
 function parseModulePath(modulePath: string) {
