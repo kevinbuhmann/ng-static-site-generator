@@ -10,7 +10,6 @@ const options: MarkedOptions = {
   smartLists: true,
   smartypants: false,
   highlight: (code, lang) => {
-    console.log(highlightAuto(code, lang ? [lang] : undefined));
     return highlightAuto(code, lang ? [lang] : undefined).value;
   }
 };
