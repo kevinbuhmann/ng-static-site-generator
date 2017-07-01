@@ -88,7 +88,7 @@ const ngStaticSiteGeneratorModuleOptions: ModuleOptions = {
 })
 export class AppModule { }
 
-// my-component.ts
+// my-component.component.ts
 import { BlogService } from 'ng-static-site-generator';
 
 @Component({
