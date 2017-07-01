@@ -1,3 +1,4 @@
+import { highlightAuto } from 'highlight.js';
 import * as marked from 'marked';
 
 const options: MarkedOptions = {
@@ -7,7 +8,11 @@ const options: MarkedOptions = {
   pedantic: false,
   sanitize: false,
   smartLists: true,
-  smartypants: false
+  smartypants: false,
+  highlight: (code, lang) => {
+    console.log(highlightAuto(code, lang ? [lang] : undefined));
+    return highlightAuto(code, lang ? [lang] : undefined).value;
+  }
 };
 
 export function renderMarkdownToHtml(markdown: string) {
